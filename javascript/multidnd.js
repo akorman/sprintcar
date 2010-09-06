@@ -244,8 +244,6 @@
   		});
   		$('.ui-selecting', this.element[0]).each(function() {
   			var selectee = $.data(this, "selectable-item");
-  			console.log($(event.target));
-  			console.log(selectee.$element);
   			if( $(event.target)[0] == selectee.$element[0] ) {
   			  selectee.$element.removeClass('ui-selecting').addClass('ui-selected');
   			  selectee.selecting = false;
