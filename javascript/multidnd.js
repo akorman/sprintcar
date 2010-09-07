@@ -153,31 +153,50 @@
 
   		var options = this.options;
 
-  		$('.ui-unselecting', this.element[0]).each(function() {
-  			var selectee = $.data(this, "selectable-item");
-  			selectee.$element.removeClass('ui-unselecting');
-  			selectee.unselecting = false;
-  			selectee.startselected = false;
-  			self._trigger("unselected", event, {
-  				unselected: selectee.element
-  			});
-  		});
-  		$('.ui-selecting', this.element[0]).each(function() {
-  			var selectee = $.data(this, "selectable-item");
-  			if( $(event.target)[0] == selectee.$element[0] ) {
-  			  selectee.$element.removeClass('ui-selecting').addClass('ui-selected');
-  			  selectee.selecting = false;
-  			  selectee.selected = true;
-  			  selectee.startselected = true;
-  			  self._trigger("selected", event, {
-  				  selected: selectee.element
-  			  });
-			  }
-			  else {
-			    selectee.$element.removeClass('ui-selecting');
-			    selectee.selecting = false;
-			  }
-  		});
+
+      // non-meta key mouse up on an element that is selected
+      if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
+        // everything that is already selected should be put in state of unselecting
+        
+        // everything that was already selected should be put in state of unselected
+        this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
+          var selectee = $.data(this, "selectable-item");
+          selectee.$element.removeClass('ui-selected');
+          selectee.selected = false;
+          selectee.$element.addClass('ui-unselected');
+          selectee.unselected = true;
+          self._trigger("unselected", event, {
+  					unselected: selectee.element
+  				});
+        });
+      } else {
+    		$('.ui-unselecting', this.element[0]).each(function() {
+    			var selectee = $.data(this, "selectable-item");
+    			selectee.$element.removeClass('ui-unselecting');
+    			selectee.unselecting = false;
+    			selectee.startselected = false;
+    			self._trigger("unselected", event, {
+    				unselected: selectee.element
+    			});
+    		});
+    		$('.ui-selecting', this.element[0]).each(function() {
+    			var selectee = $.data(this, "selectable-item");
+    			if( $(event.target)[0] == selectee.$element[0] ) {
+    			  selectee.$element.removeClass('ui-selecting').addClass('ui-selected');
+    			  selectee.selecting = false;
+    			  selectee.selected = true;
+    			  selectee.startselected = true;
+    			  self._trigger("selected", event, {
+    				  selected: selectee.element
+    			  });
+  			  }
+  			  else {
+  			    selectee.$element.removeClass('ui-selecting');
+  			    selectee.selecting = false;
+  			  }
+    		});        
+      }
+
   		this._trigger("stop", event);
 
       // this.helper.remove();
