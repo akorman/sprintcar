@@ -58,6 +58,10 @@
   		this.refresh();
 
   		this.selectees = selectees.addClass("ui-selectee");
+  		
+  		selectees.each(function () {
+    		$(this).draggablenomouse();  		  
+  		});
 
   		this._mouseInit();
 
@@ -105,7 +109,6 @@
   		}
       
       if (!$(event.target).hasClass('ui-selected') && !event.metaKey) { // mouse down on non-selected item prep for drag
-        console.log("preping for drag of unselected item");
         this.possible_nonselected_drag = true;
       } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on a non-selected item
         // move the item that was meta mouse downed to a state of selected
@@ -128,19 +131,31 @@
   		
       if (this.dragged) { // have already initialized dragging
         console.log("Normal Drag");
+        if (this.possible_nonselected_drag) {
+          console.log(event.target);
+          $(event.target).draggablenomouse("mouseDrag", event, false);
+        } else {
+          this.selectees.filter('.ui-selected').each(function () {
+            console.log(this);
+            $(this).draggablenomouse("mouseDrag", event, false);
+          });          
+        }
       } else { // have NOT initialized dragging
         if (this._foobartitty(event)) {
-      		console.log("Initialize dragging");
       		this.dragged = true;
       		
       		if (this.possible_nonselected_drag) {
       		  console.log(event.target);
+      		  $(event.target).draggablenomouse("mouseCapture", event);
+      		  $(event.target).draggablenomouse("mouseStart", event);
       		} else {
         		// Initialize our dragging functionality for each draggable element
             // grab all elements that are in a state of selecting or selected
             // console.log("Items that should be draggable");
             this.selectees.filter('.ui-selected').each(function () {
               console.log(this);
+              $(this).draggablenomouse("mouseCapture", event);
+              $(this).draggablenomouse("mouseStart", event);
             });      		  
       		}
         }  		  
@@ -157,6 +172,13 @@
 
       if (this.dragged) {
         this.dragged = false;
+        if (this.possible_nonselected_drag) {
+          $(event.target).draggablenomouse("mouseStop", event);
+        } else {
+          this.selectees.filter('.ui-selected').each(function () {
+            $(this).draggablenomouse("mouseStop", event);
+          });
+        }
         return false;
       } else {
         // mouse up on a non-selected item

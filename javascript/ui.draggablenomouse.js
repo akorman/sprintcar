@@ -67,7 +67,7 @@ $.widget("ui.draggablenomouse", {
 		return this;
 	},
 
-	_mouseCapture: function(event) {
+	mouseCapture: function(event) {
 
 		var o = this.options;
 
@@ -84,8 +84,7 @@ $.widget("ui.draggablenomouse", {
 
 	},
 
-	_mouseStart: function(event) {
-
+	mouseStart: function(event) {
 		var o = this.options;
 
 		//Create and append the visible helper
@@ -152,11 +151,11 @@ $.widget("ui.draggablenomouse", {
 			$.ui.ddmanager.prepareOffsets(this, event);
 
 		this.helper.addClass("ui-draggable-dragging");
-		this._mouseDrag(event, true); //Execute the drag once - this causes the helper not to be visible before getting its correct position
+		this.mouseDrag(event, true); //Execute the drag once - this causes the helper not to be visible before getting its correct position
 		return true;
 	},
 
-	_mouseDrag: function(event, noPropagation) {
+	mouseDrag: function(event, noPropagation) {
 
 		//Compute the helpers position
 		this.position = this._generatePosition(event);
@@ -179,7 +178,7 @@ $.widget("ui.draggablenomouse", {
 		return false;
 	},
 
-	_mouseStop: function(event) {
+	mouseStop: function(event) {
 
 		//If we are using droppables, inform the manager about the drop
 		var dropped = false;
@@ -380,7 +379,6 @@ $.widget("ui.draggablenomouse", {
 	},
 
 	_generatePosition: function(event) {
-
 		var o = this.options, scroll = this.cssPosition == 'absolute' && !(this.scrollParent[0] != document && $.ui.contains(this.scrollParent[0], this.offsetParent[0])) ? this.offsetParent : this.scrollParent, scrollIsRootNode = (/(html|body)/i).test(scroll[0].tagName);
 		var pageX = event.pageX;
 		var pageY = event.pageY;
@@ -567,7 +565,7 @@ $.ui.plugin.add("draggable", "connectToSortable", {
 				}
 
 				//Provided we did all the previous steps, we can fire the drag event of the sortable on every draggable drag, when it intersects with the sortable
-				if(this.instance.currentItem) this.instance._mouseDrag(event);
+				if(this.instance.currentItem) this.instance.mouseDrag(event);
 
 			} else {
 
