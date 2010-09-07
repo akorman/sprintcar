@@ -130,16 +130,19 @@
       // })
   	},
 
-  	_mouseDrag: function(event) {
-  	  console.log("mouse drag happened");
-  		var self = this;
+    _mouseDrag: function(event) {
+      var self = this;
   		
-  		if (this._foobartitty(event)) {
-    		this.dragged = true;
-		  }	
-  		
-  		return false;
-  	},
+      if (this.dragged) { // have already initialized dragging
+        console.log("Normal Drag");
+      } else { // have NOT initialized dragging
+        if (this._foobartitty(event)) {
+      		console.log("Initialize dragging");
+      		this.dragged = true;
+        }  		  
+      }
+      return false;
+    },
 
   	_mouseStop: function(event) {
   	  console.log("mouse stop happened");
