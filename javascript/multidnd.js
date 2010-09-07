@@ -32,6 +32,7 @@
   		this.element.addClass("ui-selectable");
 
   		this.dragged = false;
+      this.possible_nonselected_drag = false;
 
   		// cache selectee children based on filter
   		var selectees;
@@ -102,16 +103,16 @@
   		if (options.autoRefresh) {
   			this.refresh();
   		}
-              
-      // meta mouse down on a non-selected item
-      if (!$(event.target).hasClass('ui-selected') && event.metaKey) {
+      
+      if (!$(event.target).hasClass('ui-selected') && !event.metaKey) { // mouse down on non-selected item prep for drag
+        console.log("preping for drag of unselected item");
+        this.possible_nonselected_drag = true;
+      } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on a non-selected item
         // move the item that was meta mouse downed to a state of selected
         var selectee = $(event.target).data("selectable-item");
         selectee.$element.addClass('ui-selected');
         selectee.selected = true;
-        
-      // meta mouse down on an already selected item 
-      } else if ($(event.target).hasClass('ui-selected') && event.metaKey) {
+      } else if ($(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on an already selected item 
         // move the item that was meta mouse downed to a state of unselecting
         var selectee = $(event.target).data("selectable-item");
         selectee.$element.removeClass('ui-selected');
@@ -119,15 +120,7 @@
         self._trigger("unselected", event, {
 					unselected: selectee.element
 				});
-			
       }
-      
-      // Initialize our dragging functionality for each draggable element
-      // grab all elements that are in a state of selecting or selected
-      // console.log("Items that should be draggable");
-      // this.selectees.filter('.ui-selected,.ui-selecting').each(function () {
-      //   console.log(this);
-      // })
   	},
 
     _mouseDrag: function(event) {
@@ -139,6 +132,17 @@
         if (this._foobartitty(event)) {
       		console.log("Initialize dragging");
       		this.dragged = true;
+      		
+      		if (this.possible_nonselected_drag) {
+      		  console.log(event.target);
+      		} else {
+        		// Initialize our dragging functionality for each draggable element
+            // grab all elements that are in a state of selecting or selected
+            // console.log("Items that should be draggable");
+            this.selectees.filter('.ui-selected').each(function () {
+              console.log(this);
+            });      		  
+      		}
         }  		  
       }
       return false;
@@ -148,6 +152,8 @@
   	  console.log("mouse stop happened");
   		var self = this;
   		var options = this.options;
+  		
+  		this.possible_nonselected_drag = false;
 
       if (this.dragged) {
         this.dragged = false;
