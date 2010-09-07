@@ -20,7 +20,8 @@
   	options: {
   		appendTo: 'body',
   		autoRefresh: true,
-  		distance: 0,
+  		threshold: 10,
+  		distance: 0, // NOTE WE HAVE TO HAVE THIS TO HANDLE THRESHOLD DON'T CHANGE
   		helper: "original",
   		filter: '*',
   		tolerance: 'touch'
@@ -74,8 +75,17 @@
 
   		return this;
   	},
+  	
+  	_foobartitty: function(event) {
+  		return (Math.max(
+  				Math.abs(this.opos[0] - event.pageX),
+  				Math.abs(this.opos[1] - event.pageY)
+  			) >= this.options.threshold
+  		);
+  	},
 
   	_mouseStart: function(event) {
+  	  console.log("mouse start happened");
   		var self = this;
 
   		this.opos = [event.pageX, event.pageY];
@@ -92,32 +102,13 @@
   		if (options.autoRefresh) {
   			this.refresh();
   		}
-      
-      // mouse down on a non-selected item
-      if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
-        // move all items that were previously selected to a state of unselecting
-        this.selectees.filter('.ui-selected').each(function() {
-          var selectee = $.data(this, "selectable-item");
-          selectee.$element.removeClass('ui-selected');
-          selectee.selected = false;
-          selectee.$element.addClass('ui-unselecting');
-          selectee.unselecting = true;
-          self._trigger("unselecting", event, {
-  					unselecting: selectee.element
-  				});
-        });
-        
-        // move the item that was mouse downed on to a state of selecting
-        var selectee = $(event.target).data("selectable-item");
-        selectee.$element.addClass('ui-selecting');
-        selectee.selecting = true;
-        
+              
       // meta mouse down on a non-selected item
-      } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) {
-        // move the item that was meta mouse downed to a state of selecting
+      if (!$(event.target).hasClass('ui-selected') && event.metaKey) {
+        // move the item that was meta mouse downed to a state of selected
         var selectee = $(event.target).data("selectable-item");
-        selectee.$element.addClass('ui-selecting');
-        selectee.selecting = true;
+        selectee.$element.addClass('ui-selected');
+        selectee.selected = true;
         
       // meta mouse down on an already selected item 
       } else if ($(event.target).hasClass('ui-selected') && event.metaKey) {
@@ -125,76 +116,71 @@
         var selectee = $(event.target).data("selectable-item");
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
-        selectee.$element.addClass('ui-unselecting');
-        selectee.unselecting = true;
-        self._trigger("unselecting", event, {
-					unselecting: selectee.element
+        self._trigger("unselected", event, {
+					unselected: selectee.element
 				});
 			
-		  // mouse down on an already selected item  
-      } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
-        // do nothing in this case
-      }  		
+      }
+      
+      // Initialize our dragging functionality for each draggable element
+      // grab all elements that are in a state of selecting or selected
+      // console.log("Items that should be draggable");
+      // this.selectees.filter('.ui-selected,.ui-selecting').each(function () {
+      //   console.log(this);
+      // })
   	},
 
   	_mouseDrag: function(event) {
+  	  console.log("mouse drag happened");
   		var self = this;
-  		this.dragged = true;
   		
-  		console.log("Mouse Drag just happened");
-
+  		if (this._foobartitty(event)) {
+    		this.dragged = true;
+		} else {
+  		this.dragged = false;		  
+		}  		
+  		
   		return false;
   	},
 
   	_mouseStop: function(event) {
+  	  console.log("mouse stop happened");
   		var self = this;
-
-  		this.dragged = false;
-
   		var options = this.options;
 
+      if (this.dragged) {
+        this.dragged = false;
+        return false;
+      }
 
-      // non-meta key mouse up on an element that is selected
-      if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
-        // everything that is already selected should be put in state of unselecting
+      // mouse up on a non-selected item
+      if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
+        // move all items that were previously selected to a state of unselected
+        this.selectees.filter('.ui-selected').each(function() {
+          var selectee = $.data(this, "selectable-item");
+          selectee.$element.removeClass('ui-selected');
+          selectee.selected = false;
+          self._trigger("unselected", event, {
+  					unselected: selectee.element
+  				});
+        });
         
+        // move the item that was mouse downed on to a state of selected
+        var selectee = $(event.target).data("selectable-item");
+        selectee.$element.addClass('ui-selected');
+        selectee.selected = true;
+        
+      // mouse up on an already selected item
+      } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
         // everything that was already selected should be put in state of unselected
         this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
           var selectee = $.data(this, "selectable-item");
           selectee.$element.removeClass('ui-selected');
           selectee.selected = false;
-          selectee.$element.addClass('ui-unselected');
-          selectee.unselected = true;
           self._trigger("unselected", event, {
   					unselected: selectee.element
   				});
         });
-      } else {
-    		$('.ui-unselecting', this.element[0]).each(function() {
-    			var selectee = $.data(this, "selectable-item");
-    			selectee.$element.removeClass('ui-unselecting');
-    			selectee.unselecting = false;
-    			selectee.startselected = false;
-    			self._trigger("unselected", event, {
-    				unselected: selectee.element
-    			});
-    		});
-    		$('.ui-selecting', this.element[0]).each(function() {
-    			var selectee = $.data(this, "selectable-item");
-    			if( $(event.target)[0] == selectee.$element[0] ) {
-    			  selectee.$element.removeClass('ui-selecting').addClass('ui-selected');
-    			  selectee.selecting = false;
-    			  selectee.selected = true;
-    			  selectee.startselected = true;
-    			  self._trigger("selected", event, {
-    				  selected: selectee.element
-    			  });
-  			  }
-  			  else {
-  			    selectee.$element.removeClass('ui-selecting');
-  			    selectee.selecting = false;
-  			  }
-    		});        
       }
 
   		this._trigger("stop", event);
