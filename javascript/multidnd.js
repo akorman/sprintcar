@@ -136,9 +136,7 @@
   		
   		if (this._foobartitty(event)) {
     		this.dragged = true;
-		} else {
-  		this.dragged = false;		  
-		}  		
+		  }	
   		
   		return false;
   	},
@@ -151,36 +149,36 @@
       if (this.dragged) {
         this.dragged = false;
         return false;
-      }
+      } else {
+        // mouse up on a non-selected item
+        if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
+          // move all items that were previously selected to a state of unselected
+          this.selectees.filter('.ui-selected').each(function() {
+            var selectee = $.data(this, "selectable-item");
+            selectee.$element.removeClass('ui-selected');
+            selectee.selected = false;
+            self._trigger("unselected", event, {
+    					unselected: selectee.element
+    				});
+          });
 
-      // mouse up on a non-selected item
-      if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
-        // move all items that were previously selected to a state of unselected
-        this.selectees.filter('.ui-selected').each(function() {
-          var selectee = $.data(this, "selectable-item");
-          selectee.$element.removeClass('ui-selected');
-          selectee.selected = false;
-          self._trigger("unselected", event, {
-  					unselected: selectee.element
-  				});
-        });
-        
-        // move the item that was mouse downed on to a state of selected
-        var selectee = $(event.target).data("selectable-item");
-        selectee.$element.addClass('ui-selected');
-        selectee.selected = true;
-        
-      // mouse up on an already selected item
-      } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
-        // everything that was already selected should be put in state of unselected
-        this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
-          var selectee = $.data(this, "selectable-item");
-          selectee.$element.removeClass('ui-selected');
-          selectee.selected = false;
-          self._trigger("unselected", event, {
-  					unselected: selectee.element
-  				});
-        });
+          // move the item that was mouse downed on to a state of selected
+          var selectee = $(event.target).data("selectable-item");
+          selectee.$element.addClass('ui-selected');
+          selectee.selected = true;
+
+        // mouse up on an already selected item
+        } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
+          // everything that was already selected should be put in state of unselected
+          this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
+            var selectee = $.data(this, "selectable-item");
+            selectee.$element.removeClass('ui-selected');
+            selectee.selected = false;
+            self._trigger("unselected", event, {
+    					unselected: selectee.element
+    				});
+          });
+        }        
       }
 
   		this._trigger("stop", event);
