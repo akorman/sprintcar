@@ -4,11 +4,13 @@
   <script type="text/javascript" src="javascript/jquery-1.4.2.min.js"></script>  
   <script type="text/javascript" src="javascript/jquery-ui-1.8.4.custom.min.js"></script>  
   <script type="text/javascript" src="javascript/multidnd.js"></script>
+  <script type="text/javascript" src="javascript/ui.draggablenomouse.js"></script>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <title>index</title>
   
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
+      $('#list').children().draggablenomouse();
       $('#list').multidnd();
     });
   </script>
