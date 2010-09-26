@@ -124,16 +124,27 @@
 					unselected: selectee.element
 				});
       }
+      
+      // prep logic for beginning a mouse drag
+      if ($(event.target).hasClass('ui-draggable')) {
+        this.element.data("dragee", event.target);
+      }
+      else {
+        this.element.data("dragee", null);
+      }
   	},
 
     _mouseDrag: function(event) {
       var self = this;
-  		
+  		var dragee = self.element.data("dragee");
+  		if( !dragee ) 
+  		  return;
+  		  
       if (this.dragged) { // have already initialized dragging
         console.log("Normal Drag");
         if (this.possible_nonselected_drag) {
-          console.log(event.target);
-          $(event.target).draggablenomouse("mouseDrag", event, false);
+          console.log(dragee);
+          $(dragee).draggablenomouse("mouseDrag", event, true);
         } else {
           this.selectees.filter('.ui-selected').each(function () {
             console.log(this);
@@ -145,9 +156,9 @@
       		this.dragged = true;
       		
       		if (this.possible_nonselected_drag) {
-      		  console.log(event.target);
-      		  $(event.target).draggablenomouse("mouseCapture", event);
-      		  $(event.target).draggablenomouse("mouseStart", event);
+      		  console.log(dragee);
+      		  $(dragee).draggablenomouse("mouseCapture", event);
+      		  $(dragee).draggablenomouse("mouseStart", event);
       		} else {
         		// Initialize our dragging functionality for each draggable element
             // grab all elements that are in a state of selecting or selected
@@ -167,13 +178,14 @@
   	  console.log("mouse stop happened");
   		var self = this;
   		var options = this.options;
+  		var dragee = self.element.data("dragee");
   		
   		this.possible_nonselected_drag = false;
 
       if (this.dragged) {
         this.dragged = false;
         if (this.possible_nonselected_drag) {
-          $(event.target).draggablenomouse("mouseStop", event);
+          $(dragee).draggablenomouse("mouseStop", event);
         } else {
           this.selectees.filter('.ui-selected').each(function () {
             $(this).draggablenomouse("mouseStop", event);
@@ -211,7 +223,7 @@
           });
         }        
       }
-
+      self.element.data("dragee", null);
   		this._trigger("stop", event);
 
       // this.helper.remove();

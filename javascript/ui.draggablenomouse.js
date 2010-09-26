@@ -89,7 +89,7 @@ $.widget("ui.draggablenomouse", {
 
 		//Create and append the visible helper
 		this.helper = this._createHelper(event);
-
+    console.log(this.helper);
 		//Cache the helper size
 		this._cacheHelperProportions();
 
@@ -245,8 +245,18 @@ $.widget("ui.draggablenomouse", {
 		if(!helper.parents('body').length)
 			helper.appendTo((o.appendTo == 'parent' ? this.element[0].parentNode : o.appendTo));
 
-		if(helper[0] != this.element[0] && !(/(fixed|absolute)/).test(helper.css("position")))
+    var condOne = helper[0] != this.element[0];
+    var condTwo =  !(/(fixed|absolute)/).test(helper.css("position"));
+    
+    console.log("condOne = ");
+    console.log(condOne);
+    console.log("condTwo = ");
+    console.log(condTwo);
+    
+		if( condOne && condTwo ) {
+			console.log("inside absolute setting condition");
 			helper.css("position", "absolute");
+		}
 
 		return helper;
 
