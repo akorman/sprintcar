@@ -60,7 +60,9 @@
   		this.selectees = selectees.addClass("ui-selectee");
   		
   		selectees.each(function () {
-    		$(this).draggablenomouse();  		  
+    		$(this).draggablenomouse({
+    		  revert: "invalid"
+    		});  		  
   		});
 
   		this._mouseInit();
