@@ -11,6 +11,16 @@
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
       $('#list').multidnd();
+      $( "#droppable" ).droppable({
+            tolerance: "touch",
+      			drop: function( event, ui ) {
+      			  console.log("drop callback");
+      				$( this )
+      					.addClass( "ui-state-highlight" )
+      					.find( "p" )
+      						.html( "Dropped!" );
+      			}
+      		});
     });
   </script>
   
@@ -30,6 +40,8 @@
     .ui-selectee {
       background-color: red;
     }
+    
+    #droppable { width: 150px; height: 150px; padding: 0.5em; float: left; margin: 10px; background-color: orange; }    
   </style>
 </head>
 <body id="index" onload="">
@@ -42,5 +54,8 @@
   <li>six</li>
   <li>seven</li>
 </ul>
+<div id="droppable" class="ui-widget-header">
+	<p>Drop here</p>
+</div>
 </body>
 </html>

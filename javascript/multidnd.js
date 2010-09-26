@@ -180,11 +180,10 @@
   		var options = this.options;
   		var dragee = self.element.data("dragee");
   		
-  		this.possible_nonselected_drag = false;
-
       if (this.dragged) {
         this.dragged = false;
         if (this.possible_nonselected_drag) {
+          console.log("draggable no mouse stop");
           $(dragee).draggablenomouse("mouseStop", event);
         } else {
           this.selectees.filter('.ui-selected').each(function () {
@@ -223,6 +222,7 @@
           });
         }        
       }
+  		this.possible_nonselected_drag = false;      
       self.element.data("dragee", null);
   		this._trigger("stop", event);
 

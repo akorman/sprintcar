@@ -182,8 +182,10 @@ $.widget("ui.draggablenomouse", {
 
 		//If we are using droppables, inform the manager about the drop
 		var dropped = false;
-		if ($.ui.ddmanager && !this.options.dropBehaviour)
+		if ($.ui.ddmanager && !this.options.dropBehaviour) {
+			console.log("ddmanager drop event");
 			dropped = $.ui.ddmanager.drop(this, event);
+		}
 
 		//if a drop comes from outside (a sortable)
 		if(this.dropped) {
