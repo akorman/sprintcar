@@ -165,13 +165,15 @@
     },
     
     _mouseStop: function(event) {
+      console.log("in mouse stop");
       var self = this;
       var options = this.options;
       var dragee = self.element.data("dragee");
       
       if (this.dragged) {
         this.dragged = false;
-        return false;
+        this.helper.remove();
+        self.element.data("dragee", null);
       } else {
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
@@ -184,12 +186,12 @@
               unselected: selectee.element
             });
           });
-
+          
           // move the item that was mouse downed on to a state of selected
           var selectee = $(event.target).data("selectable-item");
           selectee.$element.addClass('ui-selected');
           selectee.selected = true;
-
+          
         // mouse up on an already selected item
         } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
           // everything that was already selected should be put in state of unselected
@@ -204,10 +206,7 @@
         }        
       }
       this.possible_nonselected_drag = false;      
-      self.element.data("dragee", null);
       this._trigger("stop", event);
-      
-      this.helper.remove();
       
       return false;
     },
