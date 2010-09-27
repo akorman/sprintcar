@@ -27,8 +27,8 @@
       var self = this;
       
       this.element.addClass("ui-selectable");
-      var clone = $('<li class="insert-placeholder"/>');
-      this.element.data("dragee-clone", clone);
+      var insertPlaceHolder = $('<li class="insert-placeholder"/>');
+      this.element.data("insertionPlaceHolder", insertPlaceHolder);
       
       this.dragged = false;
       this.possible_nonselected_drag = false;
@@ -129,7 +129,7 @@
     _mouseDrag: function(event) {
       var self = this;
       var dragee = self.element.data("dragee");
-      var dragee_clone = self.element.data("dragee-clone");
+      var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       if( !dragee ) 
         return;
       
@@ -148,10 +148,11 @@
         this.selectees.not(dragee).each(function(i, item) {
           if( self._isMouseOver($(this),event) ) {
             var dir = self._getDragVerticalDirection();
-            if( dir == "down" )
-              dragee_clone.insertAfter(item);
-            else
-              dragee_clone.insertBefore(item);
+            if( dir == "down" ) {
+              insertionPlaceHolder.insertAfter(item);
+            } else {
+              insertionPlaceHolder.insertBefore(item);
+            }
           }
         });
       } else { // have NOT initialized dragging
