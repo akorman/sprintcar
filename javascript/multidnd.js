@@ -170,10 +170,12 @@
       var self = this;
       var options = this.options;
       var dragee = self.element.data("dragee");
+      var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       
       if (this.dragged) {
         this.dragged = false;
         this.helper.remove();
+        insertionPlaceHolder.remove();
         self.element.data("dragee", null);
       } else {
         // mouse up on a non-selected item
