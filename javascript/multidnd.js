@@ -13,9 +13,7 @@
  *  jquery.ui.widget.js
  */
 (function($) {
-  
   $.widget("ui.multidnd", $.ui.mouse, {
-    
     options: {
       appendTo: 'body',
       autoRefresh: true,
@@ -60,8 +58,6 @@
       
       this.selectees = selectees.addClass("ui-selectee");
       this._mouseInit();
-      
-      // this.helper = $("<div class='ui-selectable-helper'></div>");
     },
     
     destroy: function() {
@@ -86,7 +82,6 @@
     },
     
     _mouseStart: function(event) {
-      console.log("mouse start happened");
       var self = this;
       
       this.opos = [event.pageX, event.pageY];
@@ -142,8 +137,6 @@
       this.positionAbs = { top: event.pageY, left: event.pageX };
       
       if (this.dragged) { // have already initialized dragging
-        console.log("Normal Drag");
-        
         // updated the helper by moving it the difference between the last
         // mouse position and the new mouse position.
         var cur_helper_pos = this.helper.offset();
@@ -159,38 +152,11 @@
               dragee_clone.insertAfter(item);
             else
               dragee_clone.insertBefore(item);
-            console.log("mouse is over ");
-            console.log(item);
           }
         });
-        
-        if (this.possible_nonselected_drag) {
-          console.log(dragee);
-//          $(dragee).draggablenomouse("mouseDrag", event, true);
-        } else {
-          this.selectees.filter('.ui-selected').each(function () {
-            console.log(this);
-//            $(this).draggablenomouse("mouseDrag", event, false);
-          });          
-        }
       } else { // have NOT initialized dragging
         if (this._foobartitty(event)) {
           this.dragged = true;
-          
-          // if (this.possible_nonselected_drag) {
-          //   console.log(dragee);
-          //   // $(dragee).draggablenomouse("mouseCapture", event);
-          //   // $(dragee).draggablenomouse("mouseStart", event);
-          // } else {
-          //   // Initialize our dragging functionality for each draggable element
-          //   // grab all elements that are in a state of selecting or selected
-          //   // console.log("Items that should be draggable");
-          //   this.selectees.filter('.ui-selected').each(function () {
-          //     console.log(this);
-          //     // $(this).draggablenomouse("mouseCapture", event);
-          //     // $(this).draggablenomouse("mouseStart", event);
-          //   });            
-          // }
           this.helper = self._createHelper(this.possible_nonselected_drag,dragee);
           $('body').append(this.helper);
         }        
@@ -199,21 +165,12 @@
     },
     
     _mouseStop: function(event) {
-      console.log("mouse stop happened");
       var self = this;
       var options = this.options;
       var dragee = self.element.data("dragee");
       
       if (this.dragged) {
         this.dragged = false;
-        if (this.possible_nonselected_drag) {
-          console.log("draggable no mouse stop");
-//          $(dragee).draggablenomouse("mouseStop", event);
-        } else {
-          this.selectees.filter('.ui-selected').each(function () {
-//            $(this).draggablenomouse("mouseStop", event);
-          });
-        }
         return false;
       } else {
         // mouse up on a non-selected item
@@ -249,9 +206,9 @@
       this.possible_nonselected_drag = false;      
       self.element.data("dragee", null);
       this._trigger("stop", event);
-
-      // this.helper.remove();
-
+      
+      this.helper.remove();
+      
       return false;
     },
     
@@ -266,7 +223,7 @@
       else
         return false;
     },
-
+    
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
       return delta != 0 && (delta > 0 ? "down" : "up");
@@ -295,7 +252,5 @@
       container.css('left', offset.left);
       return container;
     }
-
   });
-    
 })(jQuery);
