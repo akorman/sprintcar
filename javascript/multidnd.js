@@ -30,7 +30,9 @@
   		var self = this;
 
   		this.element.addClass("ui-selectable");
-
+		  var clone = $('<li class="insert-placeholder"/>');
+		  this.element.data("dragee-clone", clone);
+		  
   		this.dragged = false;
       this.possible_nonselected_drag = false;
 
@@ -61,7 +63,9 @@
   		
   		selectees.each(function () {
     		$(this).draggablenomouse({
-    		  revert: "invalid"
+//    		  revert: "invalid"
+          helper: "clone",
+          opacity: 0.35
     		});  		  
   		});
 
@@ -96,7 +100,8 @@
   		var self = this;
 
   		this.opos = [event.pageX, event.pageY];
-
+      this.positionAbs = { top: event.pageY, left: event.pageX };
+      
   		if (this.options.disabled)
   			return;
 
@@ -139,11 +144,28 @@
     _mouseDrag: function(event) {
       var self = this;
   		var dragee = self.element.data("dragee");
+  		var dragee_clone = self.element.data("dragee-clone");
   		if( !dragee ) 
   		  return;
-  		  
+  		
+  		this.lastPositionAbs = this.positionAbs;
+  		this.positionAbs = { top: event.pageY, left: event.pageX };
+  		  		  
       if (this.dragged) { // have already initialized dragging
         console.log("Normal Drag");
+
+    		this.selectees.not(dragee).each(function(i, item) {
+    		  if( self._isMouseOver($(this),event) ) {
+    		    var dir = self._getDragVerticalDirection();
+    		    if( dir == "down" )
+    		      dragee_clone.insertAfter(item);
+    		    else
+    		      dragee_clone.insertBefore(item);
+    		    console.log("mouse is over ");
+    		    console.log(item);
+    		  }
+    		});        
+        
         if (this.possible_nonselected_drag) {
           console.log(dragee);
           $(dragee).draggablenomouse("mouseDrag", event, true);
@@ -231,6 +253,23 @@
       // this.helper.remove();
 
   		return false;
+  	},
+  	
+  	_isMouseOver: function(item, event) {
+  	  var offset = item.offset();
+  	  var w = item.outerWidth();
+  	  var h = item.outerHeight();
+  	  var dx = event.pageX - offset.left;
+  	  var dy = event.pageY - offset.top;
+  	  if( dx >= 0 && dx <= w && dy >= 0 && dy <= h )
+  	    return true;
+  	  else
+  	    return false;
+  	},
+
+  	_getDragVerticalDirection: function() {
+  		var delta = this.positionAbs.top - this.lastPositionAbs.top;
+  		return delta != 0 && (delta > 0 ? "down" : "up");
   	}
 
   });
