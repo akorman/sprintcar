@@ -60,14 +60,14 @@
   		this.refresh();
 
   		this.selectees = selectees.addClass("ui-selectee");
-  		
-  		selectees.each(function () {
-    		$(this).draggablenomouse({
-//    		  revert: "invalid"
-          helper: "clone",
-          opacity: 0.35
-    		});  		  
-  		});
+//      
+//      selectees.each(function () {
+//        $(this).draggablenomouse({
+// //         revert: "invalid"
+//           helper: "clone",
+//           opacity: 0.35
+//        });       
+//      });
 
   		this._mouseInit();
 
@@ -133,7 +133,7 @@
       }
       
       // prep logic for beginning a mouse drag
-      if ($(event.target).hasClass('ui-draggable')) {
+      if ($(event.target).hasClass('ui-selectee')) {
         this.element.data("dragee", event.target);
       }
       else {
@@ -168,11 +168,11 @@
         
         if (this.possible_nonselected_drag) {
           console.log(dragee);
-          $(dragee).draggablenomouse("mouseDrag", event, true);
+//          $(dragee).draggablenomouse("mouseDrag", event, true);
         } else {
           this.selectees.filter('.ui-selected').each(function () {
             console.log(this);
-            $(this).draggablenomouse("mouseDrag", event, false);
+//            $(this).draggablenomouse("mouseDrag", event, false);
           });          
         }
       } else { // have NOT initialized dragging
@@ -181,18 +181,20 @@
       		
       		if (this.possible_nonselected_drag) {
       		  console.log(dragee);
-      		  $(dragee).draggablenomouse("mouseCapture", event);
-      		  $(dragee).draggablenomouse("mouseStart", event);
+            // $(dragee).draggablenomouse("mouseCapture", event);
+            // $(dragee).draggablenomouse("mouseStart", event);
       		} else {
         		// Initialize our dragging functionality for each draggable element
             // grab all elements that are in a state of selecting or selected
             // console.log("Items that should be draggable");
             this.selectees.filter('.ui-selected').each(function () {
               console.log(this);
-              $(this).draggablenomouse("mouseCapture", event);
-              $(this).draggablenomouse("mouseStart", event);
+              // $(this).draggablenomouse("mouseCapture", event);
+              // $(this).draggablenomouse("mouseStart", event);
             });      		  
       		}
+          var helper = self._createHelper(this.possible_nonselected_drag,dragee);
+          $('body').append(helper);      		
         }  		  
       }
       return false;
@@ -208,10 +210,10 @@
         this.dragged = false;
         if (this.possible_nonselected_drag) {
           console.log("draggable no mouse stop");
-          $(dragee).draggablenomouse("mouseStop", event);
+//          $(dragee).draggablenomouse("mouseStop", event);
         } else {
           this.selectees.filter('.ui-selected').each(function () {
-            $(this).draggablenomouse("mouseStop", event);
+//            $(this).draggablenomouse("mouseStop", event);
           });
         }
         return false;
@@ -270,6 +272,28 @@
   	_getDragVerticalDirection: function() {
   		var delta = this.positionAbs.top - this.lastPositionAbs.top;
   		return delta != 0 && (delta > 0 ? "down" : "up");
+  	},
+  	
+  	_createHelper: function(nonselected_drag, dragee) {
+  	  var container = $('<div style="position: absolute;"></div>');
+  	  var clone = null;
+  	  var offset = $(dragee).offset();
+  	  if( nonselected_drag ) {
+  	    clone = $(dragee).clone();
+  	    clone = $('<ul></ul>').append(clone);
+  	    console.log(clone);
+  	  }
+  	  else {
+    	  clone = this.element.clone();
+    	  clone.find('.ui-selected').first().prevAll().remove();
+    	  clone.find('.ui-selected').last().nextAll().remove();
+    	  clone.find('.ui-selectee').not('.ui-selected').css('visibility', 'hidden');  	    
+  	  }
+  	  container.append(clone);
+  	  container.css('opacity', 0.35);
+  	  container.css('top', offset.top);
+  	  container.css('left', offset.left);
+  	  return container;
   	}
 
   });
