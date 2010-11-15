@@ -21,7 +21,10 @@
       distance: 0, // NOTE WE HAVE TO HAVE THIS TO HANDLE THRESHOLD DON'T CHANGE
       helper: "original",
       filter: '*',
-      tolerance: 'touch'
+      tolerance: 'touch',
+      scope: 'default',
+      refreshPositions: false,
+      tolerance: 'intersect'
     },
     _create: function() {
       var self = this;
@@ -81,6 +84,13 @@
       );
     },
     
+  	_cacheHelperProportions: function() {
+  		this.helperProportions = {
+  			width: this.helper.outerWidth(),
+  			height: this.helper.outerHeight()
+  		};
+  	},
+  	    
     _mouseStart: function(event) {
       var self = this;
       
@@ -155,10 +165,23 @@
             }
           }
         });
+        
+        //Interconnect with droppables
+    		if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
+    		
       } else { // have NOT initialized dragging
         if (this._foobartitty(event)) {
           this.dragged = true;
           this.helper = self._createHelper(this.possible_nonselected_drag,dragee);
+          this._cacheHelperProportions();
+          this.currentItem = this.helper;
+          
+          //Prepare possible droppables
+      		if($.ui.ddmanager) {
+      			$.ui.ddmanager.current = this;
+      			$.ui.ddmanager.prepareOffsets(this, event);
+          }
+      			
           $('body').append(this.helper);
         }        
       }
@@ -177,6 +200,10 @@
         this.helper.remove();
         insertionPlaceHolder.remove();
         self.element.data("dragee", null);
+        
+        //If we are using droppables, inform the manager about the drop
+    		if ($.ui.ddmanager)
+    			$.ui.ddmanager.drop(this, event);
       } else {
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {

@@ -4,7 +4,6 @@
   <script type="text/javascript" src="javascript/jquery-1.4.2.min.js"></script>  
   <script type="text/javascript" src="javascript/jquery-ui-1.8.4.custom.min.js"></script>  
   <script type="text/javascript" src="javascript/multidnd.js"></script>
-  <script type="text/javascript" src="javascript/ui.draggablenomouse.js"></script>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
   <title>index</title>
   
@@ -15,6 +14,10 @@
             tolerance: "touch",
       			drop: function( event, ui ) {
       			  console.log("drop callback");
+      			  console.log(event);
+      			  console.log(ui);
+      			  console.log(this);
+      			  console.log(ui.draggable);
       				$( this )
       					.addClass( "ui-state-highlight" )
       					.find( "p" )
