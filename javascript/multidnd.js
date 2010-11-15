@@ -37,10 +37,9 @@
       this.possible_nonselected_drag = false;
       
       // cache selectee children based on filter
-      var selectees;
       this.refresh = function() {
-        selectees = $(self.options.filter, self.element[0]);
-        selectees.each(function() {
+        this.selectees = $(self.options.filter, self.element[0]);
+        this.selectees.each(function() {
           var $this = $(this);
           var pos = $this.offset();
           $.data(this, "selectable-item", {
@@ -55,11 +54,12 @@
             selecting: $this.hasClass('ui-selecting'),
             unselecting: $this.hasClass('ui-unselecting')
           });
+          if( !$(this).hasClass('ui-selectee') ) {
+            $(this).addClass('ui-selectee');
+          }
         });
       };
       this.refresh();
-      
-      this.selectees = selectees.addClass("ui-selectee");
       this._mouseInit();
     },
     
@@ -90,7 +90,7 @@
   			height: this.helper.outerHeight()
   		};
   	},
-  	    
+  	      	    
     _mouseStart: function(event) {
       var self = this;
       
@@ -101,9 +101,7 @@
         return;
       
       var options = this.options;
-      
-      this.selectees = $(options.filter, this.element[0]);
-      
+
       this._trigger("start", event);
       
       if (options.autoRefresh) {
@@ -223,8 +221,8 @@
 
             helperSelectees.insertAfter(insertionPlaceHolder);
         		$.ui.ddmanager.current = null;
-        		
-        		this._trigger('update', event, this._uiHash());
+        	  self.refresh();
+        		self._trigger('update', event, this._uiHash());
         }
         else {
           //If we are using droppables, inform the manager about the drop
@@ -325,6 +323,23 @@
   			item: self.currentItem,
   			sender: inst ? inst.element : null
   		};
-  	}
+  	},
+  	
+  	serialize: function(o) {
+
+  		var items = this.selectees;
+  		var str = []; o = o || {};
+
+  		$(items).each(function() {
+  			var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
+  			if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
+  		});
+
+  		if(!str.length && o.key) {
+  			str.push(o.key + '=');
+  		}
+
+  		return str.join('&');
+  	}  	
   });
 })(jQuery);

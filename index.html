@@ -10,10 +10,11 @@
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
       $('#list').multidnd({
-        reordered: function(event, data) {
-          console.log("reordered");
+        update: function(event, data) {
+          console.log("update");
           console.log(event);
           console.log(data);
+          console.log($('#list').multidnd('serialize'));
         }
       });
       $( "#droppable" ).droppable({
@@ -67,13 +68,13 @@
 </head>
 <body id="index" onload="">
 <ul id="list">
-  <li>one</li>
-  <li>two</li>
-  <li>three</li>
-  <li>four</li>
-  <li>five</li>
-  <li>six</li>
-  <li>seven</li>
+  <li id='task_1'>one</li>
+  <li id='task_2'>two</li>
+  <li id='task_3'>three</li>
+  <li id='task_4'>four</li>
+  <li id='task_5'>five</li>
+  <li id='task_6'>six</li>
+  <li id='task_7'>seven</li>
 </ul>
 <div id="droppable" class="ui-widget-header">
 	<p>Drop here</p>
