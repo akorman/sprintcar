@@ -165,13 +165,18 @@
             }
           }
         });
-        
+                        
         //Interconnect with droppables
     		if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
     		
       } else { // have NOT initialized dragging
         if (this._foobartitty(event)) {
           this.dragged = true;
+          
+          this.selectees.each(function(idx) {
+            $(this).data('multidnd-index', idx);
+          });
+          
           this.helper = self._createHelper(this.possible_nonselected_drag,dragee);
           this._cacheHelperProportions();
           this.currentItem = this.helper;
@@ -195,15 +200,42 @@
       var dragee = self.element.data("dragee");
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       
-      if (this.dragged) {
+      if (this.dragged) {        
+        var contPos = this.element.offset();
+        var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
+        
+        if( this.positionAbs.top > contPos.top &&
+            this.positionAbs.left > contPos.left &&
+            this.positionAbs.top < (contPos.top + contDim.height) &&
+            this.positionAbs.left < (contPos.left + contDim.width) )
+        {
+            console.log("INSIDE");
+            var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
+            console.log(helperSelectees);
+
+            helperSelectees.each(function() {
+              var index = $(this).data('multidnd-index');
+              var origSelectee = self.selectees.filter(function() {
+                return ($(this).data('multidnd-index') == index);
+              });
+              origSelectee.remove();
+            });
+
+            helperSelectees.insertAfter(insertionPlaceHolder);
+        		$.ui.ddmanager.current = null;
+        		
+        		this._trigger('update', event, this._uiHash());
+        }
+        else {
+          //If we are using droppables, inform the manager about the drop
+      		if ($.ui.ddmanager)
+      			$.ui.ddmanager.drop(this, event);          
+        }
+        
         this.dragged = false;
         this.helper.remove();
         insertionPlaceHolder.remove();
-        self.element.data("dragee", null);
-        
-        //If we are using droppables, inform the manager about the drop
-    		if ($.ui.ddmanager)
-    			$.ui.ddmanager.drop(this, event);
+        self.element.data("dragee", null);                
       } else {
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
@@ -264,22 +296,35 @@
       var offset = null;
       if( nonselected_drag ) {
         offset = $(dragee).offset();
-        clone = $(dragee).clone();
+        clone = $(dragee).clone(true);
         clone = $('<ul></ul>').append(clone);
       }
       else {
         // set offset to the offset of the first selected element
         offset = this.element.find('.ui-selected:first').offset();
-        clone = this.element.clone();
+        clone = this.element.clone(true);
         clone.find('.ui-selected').first().prevAll().remove();
         clone.find('.ui-selected').last().nextAll().remove();
-        clone.find('.ui-selectee').not('.ui-selected').css('visibility', 'hidden');        
+        clone.find('.ui-selectee').not('.ui-selected').addClass('ui-selectee-hidden');      
       }
       container.append(clone);
       container.css('opacity', 0.35);
       container.css('top', offset.top);
       container.css('left', offset.left);
       return container;
-    }
+    },
+    
+    _uiHash: function(inst) {
+  		var self = inst || this;
+  		return {
+  			helper: self.helper,
+  			placeholder: self.placeholder || $([]),
+  			position: self.position,
+  			originalPosition: self.originalPosition,
+  			offset: self.positionAbs,
+  			item: self.currentItem,
+  			sender: inst ? inst.element : null
+  		};
+  	}
   });
 })(jQuery);

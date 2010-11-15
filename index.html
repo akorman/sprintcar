@@ -9,7 +9,13 @@
   
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-      $('#list').multidnd();
+      $('#list').multidnd({
+        reordered: function(event, data) {
+          console.log("reordered");
+          console.log(event);
+          console.log(data);
+        }
+      });
       $( "#droppable" ).droppable({
             tolerance: "touch",
       			drop: function( event, ui ) {
@@ -44,6 +50,10 @@
     
     .ui-selected {
       background-color: pink;
+    }
+    
+    .ui-selectee-hidden {
+      visibility: hidden;
     }
     
     #droppable { width: 150px; height: 150px; padding: 0.5em; margin: 10px; background-color: orange; }    
