@@ -190,7 +190,7 @@
       }
       return false;
     },
-    
+        
     _mouseStop: function(event) {
       console.log("in mouse stop");
       var self = this;
@@ -198,19 +198,11 @@
       var dragee = self.element.data("dragee");
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       
-      if (this.dragged) {        
-        var contPos = this.element.offset();
-        var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
+      if (self.dragged) {    
         
-        if( this.positionAbs.top > contPos.top &&
-            this.positionAbs.left > contPos.left &&
-            this.positionAbs.top < (contPos.top + contDim.height) &&
-            this.positionAbs.left < (contPos.left + contDim.width) )
+        if( self._insideWidget() )
         {
-            console.log("INSIDE");
             var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-            console.log(helperSelectees);
-
             helperSelectees.each(function() {
               var index = $(this).data('multidnd-index');
               var origSelectee = self.selectees.filter(function() {
@@ -221,7 +213,7 @@
 
             helperSelectees.insertAfter(insertionPlaceHolder);
         		$.ui.ddmanager.current = null;
-        	  self.refresh();
+        	  self.refresh();        		
         		self._trigger('update', event, this._uiHash());
         }
         else {
@@ -231,9 +223,11 @@
         }
         
         this.dragged = false;
-        this.helper.remove();
         insertionPlaceHolder.remove();
         self.element.data("dragee", null);                
+        this.helper.remove();
+        this.helper = null;
+        this.currentItem = null;        
       } else {
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
@@ -312,6 +306,20 @@
       return container;
     },
     
+    _insideWidget: function() {
+      var contPos = this.element.offset();
+      var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
+
+      if( this.positionAbs.top > contPos.top &&
+          this.positionAbs.left > contPos.left &&
+          this.positionAbs.top < (contPos.top + contDim.height) &&
+          this.positionAbs.left < (contPos.left + contDim.width) )
+      {
+          return true;
+      }      
+      return false;
+    },
+        
     _uiHash: function(inst) {
   		var self = inst || this;
   		return {
