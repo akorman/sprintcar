@@ -93,6 +93,7 @@
                 
     _mouseStart: function(event) {
       var self = this;
+      var selectee;
       
       this.opos = [event.pageX, event.pageY];
       this.positionAbs = { top: event.pageY, left: event.pageX };
@@ -112,12 +113,12 @@
         this.possible_nonselected_drag = true;
       } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on a non-selected item
         // move the item that was meta mouse downed to a state of selected
-        var selectee = $(event.target).data("selectable-item");
+        selectee = $(event.target).data("selectable-item");
         selectee.$element.addClass('ui-selected');
         selectee.selected = true;
       } else if ($(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on an already selected item 
         // move the item that was meta mouse downed to a state of unselecting
-        var selectee = $(event.target).data("selectable-item");
+        selectee = $(event.target).data("selectable-item");
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
         self._trigger("unselected", event, {
@@ -139,7 +140,7 @@
       var dragee = self.element.data("dragee");
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       if( !dragee ) 
-        return;
+        return false;
       
       this.lastPositionAbs = this.positionAbs;
       this.positionAbs = { top: event.pageY, left: event.pageX };
