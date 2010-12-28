@@ -193,7 +193,6 @@
     },
         
     _mouseStop: function(event) {
-      console.log("in mouse stop");
       var self = this;
       var options = this.options;
       var dragee = self.element.data("dragee");
@@ -226,7 +225,7 @@
         this.dragged = false;
         insertionPlaceHolder.remove();
         self.element.data("dragee", null);                
-        this.helper.remove();
+        self.helper.remove();
         this.helper = null;
         this.currentItem = null;        
       } else {
@@ -284,6 +283,7 @@
     },
     
     _createHelper: function(nonselected_drag, dragee) {
+      var self = this;
       var container = $('<div style="position: absolute;"></div>');
       var clone = null;
       var offset = null;
@@ -295,10 +295,20 @@
       else {
         // set offset to the offset of the first selected element
         offset = this.element.find('.ui-selected:first').offset();
-        clone = this.element.clone(true);
+        // clone = this.element.clone(true);
+        // I tried to use the above but it has problems because when you clone
+        // the jquery object it keeps its links to the plugin and when you
+        // then try and remove the helper later in code it triggers the
+        // destroy method on this object in turn removing all the state and
+        // applied classes rendering the plugin useless.
+        clone = $('<ul></ul>');
+        self.element.children().each(function() {
+          clone.append($(this).clone(true));
+        });
+        
         clone.find('.ui-selected').first().prevAll().remove();
         clone.find('.ui-selected').last().nextAll().remove();
-        clone.find('.ui-selectee').not('.ui-selected').addClass('ui-selectee-hidden');      
+        clone.find('.ui-selectee').not('.ui-selected').addClass('ui-selectee-hidden');
       }
       container.append(clone);
       container.css('opacity', 0.35);
