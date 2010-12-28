@@ -84,13 +84,13 @@
       );
     },
     
-  	_cacheHelperProportions: function() {
-  		this.helperProportions = {
-  			width: this.helper.outerWidth(),
-  			height: this.helper.outerHeight()
-  		};
-  	},
-  	      	    
+    _cacheHelperProportions: function() {
+      this.helperProportions = {
+        width: this.helper.outerWidth(),
+        height: this.helper.outerHeight()
+      };
+    },
+                
     _mouseStart: function(event) {
       var self = this;
       
@@ -165,8 +165,8 @@
         });
                         
         //Interconnect with droppables
-    		if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
-    		
+        if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
+        
       } else { // have NOT initialized dragging
         if (this._foobartitty(event)) {
           this.dragged = true;
@@ -180,11 +180,11 @@
           this.currentItem = this.helper;
           
           //Prepare possible droppables
-      		if($.ui.ddmanager) {
-      			$.ui.ddmanager.current = this;
-      			$.ui.ddmanager.prepareOffsets(this, event);
+          if($.ui.ddmanager) {
+            $.ui.ddmanager.current = this;
+            $.ui.ddmanager.prepareOffsets(this, event);
           }
-      			
+            
           $('body').append(this.helper);
         }        
       }
@@ -212,14 +212,14 @@
             });
 
             helperSelectees.insertAfter(insertionPlaceHolder);
-        		$.ui.ddmanager.current = null;
-        	  self.refresh();        		
-        		self._trigger('update', event, this._uiHash());
+            $.ui.ddmanager.current = null;
+            self.refresh();            
+            self._trigger('update', event, this._uiHash());
         }
         else {
           //If we are using droppables, inform the manager about the drop
-      		if ($.ui.ddmanager)
-      			$.ui.ddmanager.drop(this, event);          
+          if ($.ui.ddmanager)
+            $.ui.ddmanager.drop(this, event);          
         }
         
         this.dragged = false;
@@ -321,33 +321,33 @@
     },
         
     _uiHash: function(inst) {
-  		var self = inst || this;
-  		return {
-  			helper: self.helper,
-  			placeholder: self.placeholder || $([]),
-  			position: self.position,
-  			originalPosition: self.originalPosition,
-  			offset: self.positionAbs,
-  			item: self.currentItem,
-  			sender: inst ? inst.element : null
-  		};
-  	},
-  	
-  	serialize: function(o) {
+      var self = inst || this;
+      return {
+        helper: self.helper,
+        placeholder: self.placeholder || $([]),
+        position: self.position,
+        originalPosition: self.originalPosition,
+        offset: self.positionAbs,
+        item: self.currentItem,
+        sender: inst ? inst.element : null
+      };
+    },
+    
+    serialize: function(o) {
 
-  		var items = this.selectees;
-  		var str = []; o = o || {};
+      var items = this.selectees;
+      var str = []; o = o || {};
 
-  		$(items).each(function() {
-  			var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
-  			if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
-  		});
+      $(items).each(function() {
+        var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
+        if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
+      });
 
-  		if(!str.length && o.key) {
-  			str.push(o.key + '=');
-  		}
+      if(!str.length && o.key) {
+        str.push(o.key + '=');
+      }
 
-  		return str.join('&');
-  	}  	
+      return str.join('&');
+    }    
   });
 })(jQuery);
