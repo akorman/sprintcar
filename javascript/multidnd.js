@@ -26,6 +26,7 @@
       refreshPositions: false,
       tolerance: 'intersect'
     },
+    
     _create: function() {
       var self = this;
       
@@ -90,7 +91,7 @@
         height: this.helper.outerHeight()
       };
     },
-                
+    
     _mouseStart: function(event) {
       var self = this;
       var selectee;
@@ -102,7 +103,7 @@
         return;
       
       var options = this.options;
-
+      
       this._trigger("start", event);
       
       if (options.autoRefresh) {
@@ -164,7 +165,7 @@
             }
           }
         });
-                        
+        
         //Interconnect with droppables
         if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
         
@@ -185,13 +186,13 @@
             $.ui.ddmanager.current = this;
             $.ui.ddmanager.prepareOffsets(this, event);
           }
-            
+          
           $('body').append(this.helper);
-        }        
+        }
       }
       return false;
     },
-        
+    
     _mouseStop: function(event) {
       var self = this;
       var options = this.options;
@@ -199,35 +200,32 @@
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       
       if (self.dragged) {    
-        
-        if( self._insideWidget() )
-        {
-            var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-            helperSelectees.each(function() {
-              var index = $(this).data('multidnd-index');
-              var origSelectee = self.selectees.filter(function() {
-                return ($(this).data('multidnd-index') == index);
-              });
-              origSelectee.remove();
+        if( self._insideWidget() ) {
+          var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
+          helperSelectees.each(function() {
+            var index = $(this).data('multidnd-index');
+            var origSelectee = self.selectees.filter(function() {
+              return ($(this).data('multidnd-index') == index);
             });
-
-            helperSelectees.insertAfter(insertionPlaceHolder);
-            $.ui.ddmanager.current = null;
-            self.refresh();            
-            self._trigger('update', event, this._uiHash());
-        }
-        else {
+            origSelectee.remove();
+          });
+          
+          helperSelectees.insertAfter(insertionPlaceHolder);
+          $.ui.ddmanager.current = null;
+          self.refresh();
+          self._trigger('update', event, this._uiHash());
+        } else {
           //If we are using droppables, inform the manager about the drop
           if ($.ui.ddmanager)
-            $.ui.ddmanager.drop(this, event);          
+            $.ui.ddmanager.drop(this, event);
         }
         
         this.dragged = false;
         insertionPlaceHolder.remove();
-        self.element.data("dragee", null);                
+        self.element.data("dragee", null);
         self.helper.remove();
         this.helper = null;
-        this.currentItem = null;        
+        this.currentItem = null;
       } else {
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
@@ -257,9 +255,9 @@
               unselected: selectee.element
             });
           });
-        }        
+        }
       }
-      this.possible_nonselected_drag = false;      
+      this.possible_nonselected_drag = false;
       this._trigger("stop", event);
       
       return false;
@@ -320,17 +318,17 @@
     _insideWidget: function() {
       var contPos = this.element.offset();
       var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
-
+      
       if( this.positionAbs.top > contPos.top &&
           this.positionAbs.left > contPos.left &&
           this.positionAbs.top < (contPos.top + contDim.height) &&
           this.positionAbs.left < (contPos.left + contDim.width) )
       {
           return true;
-      }      
+      }
       return false;
     },
-        
+    
     _uiHash: function(inst) {
       var self = inst || this;
       return {
@@ -345,20 +343,19 @@
     },
     
     serialize: function(o) {
-
       var items = this.selectees;
       var str = []; o = o || {};
-
+      
       $(items).each(function() {
         var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
         if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
       });
-
+      
       if(!str.length && o.key) {
         str.push(o.key + '=');
       }
-
+      
       return str.join('&');
-    }    
+    }
   });
 })(jQuery);
