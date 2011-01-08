@@ -147,9 +147,10 @@
       // prep logic for beginning a mouse drag
       if ($(event.target).hasClass('ui-selectee')) {
         this.element.data("dragee", event.target);
-      }
-      else {
+        self.last_selected = event.target;
+      } else {
         this.element.data("dragee", null);
+        self.last_selected = null;
       }
     },
     
