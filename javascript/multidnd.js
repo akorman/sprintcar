@@ -7,6 +7,20 @@
  *
  * http://docs.jquery.com/UI/Sortables
  *
+ * Thanks to the jquery.disable.text.select.js jQuery plugin for insight into
+ * cross-browser ways to disable text select.
+      * .disableTextSelect - Disable Text Select Plugin
+      *
+      * Version: 1.1
+      * Updated: 2007-11-28
+      *
+      * Used to stop users from selecting text
+      *
+      * Copyright (c) 2007 James Dempster (letssurf@gmail.com, http://www.jdempster.com/category/jquery/disabletextselect/)
+      *
+      * Dual licensed under the MIT (MIT-LICENSE.txt)
+      * and GPL (GPL-LICENSE.txt) licenses.
+ *
  * Depends:
  *  jquery.ui.core.js
  *  jquery.ui.mouse.js
@@ -29,6 +43,8 @@
     
     _create: function() {
       var self = this;
+      
+      self._disableTextSelect();
       
       this.element.addClass("ui-selectable");
       var insertPlaceHolder = $('<li class="insert-placeholder"/>');
@@ -430,6 +446,28 @@
       }
       
       return str.join('&');
+    },
+    
+    _disableTextSelect: function() {
+      var self = this;
+      if ($.browser.mozilla) {
+        self.element.css({ 'MozUserSelect' : 'none' });
+      } else if ($.browser.msie) {
+        self.element.bind('selectsstart.disableTextSelect', function() { return false; });
+      } else {
+        self.element.bind('mousedown.disableTextSelect', function() { return false; });
+      }
+    },
+    
+    _enableTextSelect: function() {
+      var self = this;
+      if ($.browser.mozilla) {
+        self.element.css({ 'MozUserSelect' : '' });
+      } else if ($.browser.msie) {
+        self.element.unbind('selectstart.disableTextSelect');
+      } else {
+        self.element.unbind('mousedown.disableTextSelect');
+      }
     }
   });
 })(jQuery);
