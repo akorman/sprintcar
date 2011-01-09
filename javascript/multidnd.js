@@ -240,7 +240,7 @@
         this.helper.css('left', (cur_helper_pos.left + new_offset.left));
         
         
-        this.selectees.not(dragee).each(function(i, item) {
+        this.selectees.each(function(i, item) {
           if( self._isMouseOver($(this),event) ) {
             var dir = self._getDragVerticalDirection();
             if( dir == "down" ) {
@@ -284,7 +284,7 @@
       var dragee = self.element.data("dragee");
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
       
-      if (self.dragged) {    
+      if (self.dragged) {
         if( self._insideWidget() ) {
           var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
           helperSelectees.each(function() {
