@@ -36,7 +36,7 @@
       
       this.dragged = false;
       this.possible_nonselected_drag = false;
-      self.last_selected = null;
+      self.selection_stack = [];
       
       // cache selectee children based on filter
       this.refresh = function() {
@@ -111,13 +111,14 @@
         this.refresh();
       }
       
-      if (!$(event.target).hasClass('ui-selected') && !event.metaKey) { // mouse down on non-selected item prep for drag
+      if (!$(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) { // mouse down on non-selected item prep for drag
         this.possible_nonselected_drag = true;
       } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on a non-selected item
         // move the item that was meta mouse downed to a state of selected
         selectee = $(event.target).data("selectable-item");
         selectee.$element.addClass('ui-selected');
         selectee.selected = true;
+        self.selection_stack.push(selectee.element);
       } else if ($(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on an already selected item 
         // move the item that was meta mouse downed to a state of unselecting
         selectee = $(event.target).data("selectable-item");
@@ -126,13 +127,17 @@
         self._trigger("unselected", event, {
           unselected: selectee.element
         });
+        var idx = $.inArray(selectee.element,self.selection_stack);
+        if( idx != -1 ) {
+          self.selection_stack.splice(idx,1);
+        }
       } else if (!$(event.target).hasClass('ui-selected') && event.shiftKey) { // shift mouse down on non-selected item
         // check if there is already a selected item
         
           // if there is already a selected item find the most recently selected item
         
           // find the item that is being selected right now
-        
+
           // select all the items between the most recently selected item and the currently being selected item inclusively
           
         // if nothing is selected yet
@@ -142,15 +147,60 @@
           // find the item that is being selected right now
           
           // select all items between the first item in the list and the currently being selected item inclusively
+          var selection_length = self.selection_stack.length;
+          if( selection_length > 0 ) {
+            var last_selected = self.selection_stack[selection_length-1];
+            selectee = $(event.target).data("selectable-item");
+            // if we are shift selecting an already selected element, do nothing.
+            if( selectee != last_selected ) {
+              var selectee_first = null;
+              self.selectees.each(function(i, item) {
+                if( selectee_first === null ) {
+                  if( item == selectee.element ) {
+                    selectee_first = true;
+                    $(item).addClass('ui-selected');
+                    $(item).selected = true;
+                  }
+                  else if( item == last_selected ) {
+                    selectee_first = false;
+                  }
+                }
+                else {
+                  if( selectee_first === true && item == last_selected ) {
+                    return false;
+                  }
+                  else if( selectee_first === false && item == selectee.element ) {
+                    $(item).addClass('ui-selected');
+                    $(item).selected = true;                    
+                    return false;
+                  }
+                  else {
+                    $(item).addClass('ui-selected');
+                    $(item).selected = true;
+                  }
+                }
+              });              
+            }
+          }
+          else {
+            selectee = $(event.target).data("selectable-item");
+            self.selectees.each(function(i, item) {
+              $(item).addClass('ui-selected');
+              $(item).selected = true;              
+              if( item == selectee.element ) {
+                return false;
+              }
+            });
+          }
+
+
       }
       
       // prep logic for beginning a mouse drag
       if ($(event.target).hasClass('ui-selectee')) {
         this.element.data("dragee", event.target);
-        self.last_selected = event.target;
       } else {
         this.element.data("dragee", null);
-        self.last_selected = null;
       }
     },
     
@@ -158,8 +208,9 @@
       var self = this;
       var dragee = self.element.data("dragee");
       var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
-      if( !dragee ) 
+      if( !dragee ) {
         return false;
+      }
       
       this.lastPositionAbs = this.positionAbs;
       this.positionAbs = { top: event.pageY, left: event.pageX };
@@ -246,7 +297,7 @@
         this.currentItem = null;
       } else {
         // mouse up on a non-selected item
-        if (!$(event.target).hasClass('ui-selected') && !event.metaKey) {
+        if (!$(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // move all items that were previously selected to a state of unselected
           this.selectees.filter('.ui-selected').each(function() {
             var selectee = $.data(this, "selectable-item");
@@ -261,9 +312,10 @@
           var selectee = $(event.target).data("selectable-item");
           selectee.$element.addClass('ui-selected');
           selectee.selected = true;
+          self.selection_stack.push(selectee.element);
           
         // mouse up on an already selected item
-        } else if ($(event.target).hasClass('ui-selected') && !event.metaKey) {
+        } else if ($(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // everything that was already selected should be put in state of unselected
           this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
             var selectee = $.data(this, "selectable-item");
@@ -272,6 +324,10 @@
             self._trigger("unselected", event, {
               unselected: selectee.element
             });
+            var idx = $.inArray(selectee.element,self.selection_stack);
+            if( idx != -1 ) {
+              self.selection_stack.splice(idx,1);
+            }
           });
         }
       }
