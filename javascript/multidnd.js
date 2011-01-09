@@ -149,17 +149,17 @@
         }
       } else if (!$(event.target).hasClass('ui-selected') && event.shiftKey) { // shift mouse down on non-selected item
         // check if there is already a selected item
-        
+          
           // if there is already a selected item find the most recently selected item
-        
+          
           // find the item that is being selected right now
-
+          
           // select all the items between the most recently selected item and the currently being selected item inclusively
           
         // if nothing is selected yet
-        
+          
           // find the first item in the list
-        
+          
           // find the item that is being selected right now
           
           // select all items between the first item in the list and the currently being selected item inclusively
@@ -187,7 +187,7 @@
                   }
                   else if( selectee_first === false && item == selectee.element ) {
                     $(item).addClass('ui-selected');
-                    $(item).selected = true;                    
+                    $(item).selected = true;
                     return false;
                   }
                   else {
@@ -195,21 +195,21 @@
                     $(item).selected = true;
                   }
                 }
-              });              
+              });
             }
           }
           else {
             selectee = $(event.target).data("selectable-item");
             self.selectees.each(function(i, item) {
               $(item).addClass('ui-selected');
-              $(item).selected = true;              
+              $(item).selected = true;
               if( item == selectee.element ) {
                 return false;
               }
             });
           }
-
-
+          
+          
       }
       
       // prep logic for beginning a mouse drag
