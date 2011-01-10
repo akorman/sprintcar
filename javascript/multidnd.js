@@ -47,12 +47,16 @@
       self._disableTextSelect();
       
       this.element.addClass("ui-selectable");
-      var insertPlaceHolder = $('<li class="insert-placeholder"/>');
-      this.element.data("insertionPlaceHolder", insertPlaceHolder);
+      var insert_pos_identifier = $('<div class="insert-pos-identifier" style="height: 2px; width: 100%; background-color: black;"></div>');
+      $("body").append(insert_pos_identifier);
+      insert_pos_identifier.hide();
+      insert_pos_identifier.css("position","absolute");
+      this.element.data("insert_pos_identifier", insert_pos_identifier);
       
       this.dragged = false;
       this.possible_nonselected_drag = false;
       self.selection_stack = [];
+      self.current_item_hovered = null;
       
       // cache selectee children based on filter
       this.refresh = function() {
@@ -223,7 +227,7 @@
     _mouseDrag: function(event) {
       var self = this;
       var dragee = self.element.data("dragee");
-      var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
+      var insert_pos_identifier = self.element.data("insert_pos_identifier");
       if( !dragee ) {
         return false;
       }
@@ -241,13 +245,17 @@
         
         
         this.selectees.each(function(i, item) {
-          if( self._isMouseOver($(this),event) ) {
+          if( self._isMouseOver($(this),event) && !$(item).hasClass('insert-placeholder')) {
             var dir = self._getDragVerticalDirection();
             if( dir == "down" ) {
-              insertionPlaceHolder.insertAfter(item);
+              self.current_item_hovered = $(item);
             } else {
-              insertionPlaceHolder.insertBefore(item);
+              self.current_item_hovered = $(item).prev('.ui-selectee');
+              if (self.current_item_hovered.length == 0) {
+                self.current_item_hovered = $(item);
+              }
             }
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());
           }
         });
         
@@ -256,6 +264,7 @@
         
       } else { // have NOT initialized dragging
         if (this._pass_drag_threshold(event)) {
+          insert_pos_identifier.show();
           this.dragged = true;
           
           this.selectees.each(function(idx) {
@@ -282,20 +291,26 @@
       var self = this;
       var options = this.options;
       var dragee = self.element.data("dragee");
-      var insertionPlaceHolder = self.element.data("insertionPlaceHolder");
+      var insert_pos_identifier = self.element.data("insert_pos_identifier");
       
       if (self.dragged) {
         if( self._insideWidget() ) {
           var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
+          var selectee_to_rem = null;
           helperSelectees.each(function() {
             var index = $(this).data('multidnd-index');
             var origSelectee = self.selectees.filter(function() {
               return ($(this).data('multidnd-index') == index);
             });
-            origSelectee.remove();
+            origSelectee.hide();
+            selectee_to_rem = origSelectee;
           });
           
-          helperSelectees.insertAfter(insertionPlaceHolder);
+          helperSelectees.insertAfter(self.current_item_hovered);
+          if (selectee_to_rem != null) {
+            selectee_to_rem.remove();
+          }
+          
           $.ui.ddmanager.current = null;
           self.refresh();
           self._trigger('update', event, this._uiHash());
@@ -306,7 +321,7 @@
         }
         
         this.dragged = false;
-        insertionPlaceHolder.remove();
+        insert_pos_identifier.hide();
         self.element.data("dragee", null);
         self.helper.remove();
         this.helper = null;
