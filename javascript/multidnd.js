@@ -38,7 +38,8 @@
       tolerance: 'touch',
       scope: 'default',
       refreshPositions: false,
-      tolerance: 'intersect'
+      tolerance: 'intersect',
+      insert_pos_identifier: $('<div style="height: 2px; width: 100%; background-color: black;"></div>')
     },
     
     _create: function() {
@@ -47,11 +48,11 @@
       self._disableTextSelect();
       
       this.element.addClass("ui-selectable");
-      var insert_pos_identifier = $('<div class="insert-pos-identifier" style="height: 2px; width: 100%; background-color: black;"></div>');
-      $("body").append(insert_pos_identifier);
-      insert_pos_identifier.hide();
-      insert_pos_identifier.css("position","absolute");
-      this.element.data("insert_pos_identifier", insert_pos_identifier);
+      self.options.insert_pos_identifier.addClass("insert-pos-identifier");
+      $("body").append(self.options.insert_pos_identifier);
+      self.options.insert_pos_identifier.hide();
+      self.options.insert_pos_identifier.css("position","absolute");
+      this.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
       
       this.dragged = false;
       this.possible_nonselected_drag = false;
