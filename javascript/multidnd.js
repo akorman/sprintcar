@@ -39,7 +39,7 @@
       scope: 'default',
       refreshPositions: false,
       tolerance: 'intersect',
-      insert_pos_identifier: $('<div style="height: 2px; width: 100%; background-color: black;"></div>')
+      insert_pos_identifier: $('<div style="height: 2px; background-color: black;"></div>')
     },
     
     _create: function() {
@@ -52,6 +52,8 @@
       $("body").append(self.options.insert_pos_identifier);
       self.options.insert_pos_identifier.hide();
       self.options.insert_pos_identifier.css("position","absolute");
+      self.options.insert_pos_identifier.css("width", self.element.width());
+      self.options.insert_pos_identifier.css("left", self.element.position().left);
       this.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
       
       this.dragged = false;
