@@ -373,6 +373,7 @@
     _createHelper: function(nonselected_drag, dragee) {
       var self = this;
       var container = $('<div style="position: absolute;"></div>');
+      container.css("width", self.element.width());
       var clone = null;
       var offset = null;
       if( nonselected_drag ) {

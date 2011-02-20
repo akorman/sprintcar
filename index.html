@@ -40,6 +40,16 @@
       list-style-type: none;
     }
     
+    li {
+      border-radius: 5px;
+      background-color: #fcfcfc;
+      padding-left: 20px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      margin-top: 1px;
+      margin-bottom: 1px;
+    }
+    
     .ui-selecting {
       background-color: yellow;
     }
@@ -49,7 +59,7 @@
     }
     
     .ui-selected {
-      background-color: pink;
+      background-color: #b5d5ff;
     }
     
     .ui-selectee-hidden {
@@ -63,18 +73,37 @@
       max-height: 2px;
       background-color: grey;
     }
+    
+    #list {
+      width: 100%;
+    }
+    
+    #list_container {
+      width: 885px;
+      height: 800px;
+      padding-left: 6px;
+      padding-right: 10px;
+      background-color: #babec7;
+    }
+    
+    body {
+      font-family: Arial;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body id="index" onload="">
-<ul id="list">
-  <li id='task_1'>one</li>
-  <li id='task_2'>two</li>
-  <li id='task_3'>three</li>
-  <li id='task_4'>four</li>
-  <li id='task_5'>five</li>
-  <li id='task_6'>six</li>
-  <li id='task_7'>seven</li>
-</ul>
+  <div id="list_container" style="padding-top: 10px;">
+    <ul id="list">
+      <li id='task_1'>one</li>
+      <li id='task_2'>two</li>
+      <li id='task_3'>three</li>
+      <li id='task_4'>four</li>
+      <li id='task_5'>five</li>
+      <li id='task_6'>six</li>
+      <li id='task_7'>seven</li>
+    </ul>
+  </div>
 <div id="droppable" class="ui-widget-header">
   <p>Drop here</p>
 </div>
