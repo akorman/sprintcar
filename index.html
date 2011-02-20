@@ -34,35 +34,30 @@
   </script>
   
   <style type="text/css" media="screen">
-    ul {
-      margin: 0px;
-      padding: 0px;
-      list-style-type: none;
-    }
-    
-    li {
-      border-radius: 5px;
+   
+    #list > div {
+/*      border-radius: 5px;*/
       background-color: #fcfcfc;
       padding-left: 20px;
       padding-top: 5px;
       padding-bottom: 5px;
-      margin-top: 1px;
-      margin-bottom: 1px;
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
     
-    .ui-selecting {
+    #list > div.ui-selecting {
       background-color: yellow;
     }
     
-    .ui-unselecting {
+    #list > div.ui-unselecting {
       background-color: orange;
     }
     
-    .ui-selected {
+    #list > div.ui-selected {
       background-color: #b5d5ff;
     }
     
-    .ui-selectee-hidden {
+    #list > div.ui-selectee-hidden {
       visibility: hidden;
     }
     
@@ -80,10 +75,7 @@
     
     #list_container {
       width: 885px;
-      padding-left: 6px;
-      padding-right: 10px;
-      padding-top: 10px;
-      padding-bottom: 10px;
+      padding: 10px;
       background-color: #babec7;
     }
     
@@ -96,16 +88,16 @@
   </style>
 </head>
 <body id="index" onload="">
-  <div id="list_container" style="padding-top: 10px;">
-    <ul id="list">
-      <li id='task_1'>Mow the lawn</li>
-      <li id='task_2'>Paint the outside of the House</li>
-      <li id='task_3'>Run copper pipes down the front bathroom</li>
-      <li id='task_4'>Take out the garbage</li>
-      <li id='task_5'>Wash the car</li>
-      <li id='task_6'>Clean out the garage and organize the tools</li>
-      <li id='task_7'>Put new grass in the backyard</li>
-    </ul>
+  <div id="list_container">
+    <div id="list">
+      <div id='task_1'>Mow the lawn</div>
+      <div id='task_2'>Paint the outside of the House</div>
+      <div id='task_3'>Run copper pipes down the front bathroom</div>
+      <div id='task_4'>Take out the garbage</div>
+      <div id='task_5'>Wash the car</div>
+      <div id='task_6'>Clean out the garage and organize the tools</div>
+      <div id='task_7'>Put new grass in the backyard</div>
+    </div>
   </div>
 <div id="droppable" class="ui-widget-header">
   <p>Drop here</p>

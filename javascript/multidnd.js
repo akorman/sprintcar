@@ -256,17 +256,19 @@
           
           if( hover_region ) {
             self.current_item_hovered = $(item);
+            var padding = (self.current_item_hovered.outerHeight() - self.current_item_hovered.height()) / 2;
+
             if( hover_region.top && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top);
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - padding - 1);
             }
             else if( hover_region.top && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top);
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - padding - 1);
             }
             else if( hover_region.bottom && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + padding - 1);
             }
             else if( hover_region.bottom && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());              
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + padding - 1);              
             }
             if( hover_region.top || hover_region.bottom ) {
               self.current_item_hovered_region = hover_region;              
