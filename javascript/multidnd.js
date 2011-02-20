@@ -471,8 +471,6 @@
       
       objs.each(function() {
         var selectee = $.data(this, "selectable-item");
-        console.log("selectee");
-        console.log(selectee);
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
         self._trigger("unselected", event, {
