@@ -200,6 +200,7 @@
                     $(item).selected = true;
                   }
                 }
+                return true;
               });
             }
           }
@@ -303,17 +304,14 @@
             var origSelectee = self.selectees.filter(function() {
               return ($(this).data('multidnd-index') == index);
             });
-            origSelectee.hide();
-            selectee_to_rem = origSelectee;
+            origSelectee.remove();
           });
           
           helperSelectees.insertAfter(self.current_item_hovered);
-          if (selectee_to_rem != null) {
-            selectee_to_rem.remove();
-          }
           
           $.ui.ddmanager.current = null;
           self.refresh();
+          self._unselect_all_selected(self.selectees.filter('.ui-selected'));
           self._trigger('update', event, this._uiHash());
         } else {
           //If we are using droppables, inform the manager about the drop
@@ -331,14 +329,7 @@
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // move all items that were previously selected to a state of unselected
-          this.selectees.filter('.ui-selected').each(function() {
-            var selectee = $.data(this, "selectable-item");
-            selectee.$element.removeClass('ui-selected');
-            selectee.selected = false;
-            self._trigger("unselected", event, {
-              unselected: selectee.element
-            });
-          });
+          self._unselect_all_selected(self.selectees.filter('.ui-selected'));
           
           // move the item that was mouse downed on to a state of selected
           var selectee = $(event.target).data("selectable-item");
@@ -349,18 +340,7 @@
         // mouse up on an already selected item
         } else if ($(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // everything that was already selected should be put in state of unselected
-          this.selectees.filter('.ui-selected').not($(event.target)).each(function() {
-            var selectee = $.data(this, "selectable-item");
-            selectee.$element.removeClass('ui-selected');
-            selectee.selected = false;
-            self._trigger("unselected", event, {
-              unselected: selectee.element
-            });
-            var idx = $.inArray(selectee.element,self.selection_stack);
-            if( idx != -1 ) {
-              self.selection_stack.splice(idx,1);
-            }
-          });
+          self._unselect_all_selected(this.selectees.filter('.ui-selected').not($(event.target)));
         }
       }
       this.possible_nonselected_drag = false;
@@ -484,6 +464,25 @@
       } else {
         self.element.unbind('mousedown.disableTextSelect');
       }
+    },
+    
+    _unselect_all_selected: function(objs) {
+      var self = this;
+      
+      objs.each(function() {
+        var selectee = $.data(this, "selectable-item");
+        console.log("selectee");
+        console.log(selectee);
+        selectee.$element.removeClass('ui-selected');
+        selectee.selected = false;
+        self._trigger("unselected", event, {
+          unselected: selectee.element
+        });
+        var idx = $.inArray(selectee.element,self.selection_stack);
+        if( idx != -1 ) {
+          self.selection_stack.splice(idx,1);
+        }
+      });
     }
   });
 })(jQuery);
