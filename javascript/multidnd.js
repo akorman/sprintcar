@@ -63,6 +63,10 @@
       self.current_item_hovered = null;
       self.current_item_hovered_region = null;
       
+      // ensure hover_region_threshold is a sensible value.
+      if( self.options.hover_region_threshold > 0.5 )
+        self.options.hover_region_threshold = 0.5;
+      
       // cache selectee children based on filter
       this.refresh = function() {
         this.selectees = $(self.options.filter, self.element[0]);
@@ -395,7 +399,7 @@
     
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
-      return delta != 0 && (delta > 10 ? "down" : "up");
+      return delta != 0 && (delta > 0 ? "down" : "up");
     },
     
     _createHelper: function(nonselected_drag, dragee) {
