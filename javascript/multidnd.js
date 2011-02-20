@@ -39,7 +39,8 @@
       scope: 'default',
       refreshPositions: false,
       tolerance: 'intersect',
-      insert_pos_identifier: $('<div style="height: 2px; background-color: black;"></div>')
+      insert_pos_identifier: $('<div style="height: 2px; background-color: black;"></div>'),
+      hover_region_threshold: (1.0 / 3.0)
     },
     
     _create: function() {
@@ -60,6 +61,7 @@
       this.possible_nonselected_drag = false;
       self.selection_stack = [];
       self.current_item_hovered = null;
+      self.current_item_hovered_region = null;
       
       // cache selectee children based on filter
       this.refresh = function() {
@@ -249,17 +251,27 @@
         
         
         this.selectees.each(function(i, item) {
-          if( self._isMouseOver($(this),event) && !$(item).hasClass('insert-placeholder')) {
-            var dir = self._getDragVerticalDirection();
-            if( dir == "down" ) {
-              self.current_item_hovered = $(item);
-            } else {
-              self.current_item_hovered = $(item).prev('.ui-selectee');
-              if (self.current_item_hovered.length == 0) {
-                self.current_item_hovered = $(item);
-              }
+          var hover_region = self._getItemHoverRegion($(this), event);
+          var dir = self._getDragVerticalDirection();
+          
+          if( hover_region ) {
+            self.current_item_hovered = $(item);
+            if( hover_region.top && dir == "up" ) {
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top);
             }
-            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());
+            else if( hover_region.top && dir == "down" ) {
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top);
+            }
+            else if( hover_region.bottom && dir == "down" ) {
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());
+            }
+            else if( hover_region.bottom && dir == "up" ) {
+              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.innerHeight());              
+            }
+            if( hover_region.top || hover_region.bottom ) {
+              self.current_item_hovered_region = hover_region;              
+              insert_pos_identifier.show();
+            }
           }
         });
         
@@ -268,7 +280,6 @@
         
       } else { // have NOT initialized dragging
         if (this._pass_drag_threshold(event)) {
-          insert_pos_identifier.show();
           this.dragged = true;
           
           this.selectees.each(function(idx) {
@@ -310,7 +321,12 @@
             orig_selectees_to_rem.push(origSelectee);
           });
           
-          helperSelectees.insertAfter(self.current_item_hovered);
+          if( self.current_item_hovered_region.top ) {
+            helperSelectees.insertBefore(self.current_item_hovered);
+          }
+          else if( self.current_item_hovered_region.bottom ) {
+            helperSelectees.insertAfter(self.current_item_hovered);            
+          }
           $(orig_selectees_to_rem).each(function () {
             this.remove();
           });
@@ -354,22 +370,30 @@
       
       return false;
     },
-    
-    _isMouseOver: function(item, event) {
+        
+    _getItemHoverRegion: function(item, event) {
+      var self = this;
+      var result = { top: false, bottom: false, left: false, right: false };
       var offset = item.offset();
       var w = item.outerWidth();
       var h = item.outerHeight();
       var dx = event.pageX - offset.left;
       var dy = event.pageY - offset.top;
-      if( dx >= 0 && dx <= w && dy >= 0 && dy <= h )
-        return true;
+
+      if( dy > 0 && dy < (h * self.options.hover_region_threshold) )
+        result.top = true;
+      else if( dy > (h * (1.0 - self.options.hover_region_threshold)) && dy < h )
+        result.bottom = true;
+
+      if( dx > 0 && dx < w && dy > 0 && dy < h  )
+        return result;
       else
-        return false;
-    },
+        return null;
+     },
     
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
-      return delta != 0 && (delta > 0 ? "down" : "up");
+      return delta != 0 && (delta > 10 ? "down" : "up");
     },
     
     _createHelper: function(nonselected_drag, dragee) {
