@@ -298,16 +298,20 @@
       if (self.dragged) {
         if( self._insideWidget() ) {
           var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-          var selectee_to_rem = null;
+          var orig_selectees_to_rem = [];
           helperSelectees.each(function() {
             var index = $(this).data('multidnd-index');
             var origSelectee = self.selectees.filter(function() {
               return ($(this).data('multidnd-index') == index);
             });
-            origSelectee.remove();
+            origSelectee.hide();
+            orig_selectees_to_rem.push(origSelectee);
           });
           
           helperSelectees.insertAfter(self.current_item_hovered);
+          $(orig_selectees_to_rem).each(function () {
+            this.remove();
+          });
           
           $.ui.ddmanager.current = null;
           self.refresh();
