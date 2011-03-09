@@ -250,7 +250,40 @@
       
       if (this.dragged) { // have already initialized dragging
         
-        self._handleScrolling();
+        console.log(this.scrollParent);
+    		//Do scrolling
+    		if(this.options.scroll) {
+    			var o = this.options, scrolled = false;
+    			if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
+            console.log("Case 1");
+
+    				if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
+    					this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+    				else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
+    					this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+
+    				if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
+    					this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+    				else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
+    					this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+
+    			} else {
+            console.log("Case 2");
+    				if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
+    					scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+    				else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
+    					scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+
+    				if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
+    					scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+    				else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
+    					scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+
+    			}
+
+    			if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
+    				$.ui.ddmanager.prepareOffsets(this, event);
+    		}
      
         // updated the helper by moving it the difference between the last
         // mouse position and the new mouse position.
@@ -304,7 +337,7 @@
           this.currentItem = this.helper;
   
       		//Get the next scrolling parent
-      		this.scrollParent = this.helper.scrollParent();
+      		this.scrollParent = this.element.scrollParent();
       		
       		//Prepare scrolling
       		if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML')
@@ -451,41 +484,6 @@
       container.css('top', offset.top);
       container.css('left', offset.left);
       return container;
-    },
-    
-    _handleScrolling: function() {
-  		//Do scrolling
-  		if(this.options.scroll) {
-  			var o = this.options, scrolled = false;
-  			if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
-
-  				if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
-  					this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
-  				else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
-  					this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
-
-  				if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
-  					this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
-  				else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
-  					this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
-
-  			} else {
-
-  				if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
-  					scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
-  				else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
-  					scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
-
-  				if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
-  					scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
-  				else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
-  					scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
-
-  			}
-
-  			if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
-  				$.ui.ddmanager.prepareOffsets(this, event);
-  		}      
     },
     
     _insideWidget: function() {
