@@ -249,8 +249,6 @@
       this.positionAbs = { top: event.pageY, left: event.pageX };
       
       if (this.dragged) { // have already initialized dragging
-        
-        console.log(this.scrollParent);
     		//Do scrolling
     		if(this.options.scroll) {
     			var o = this.options, scrolled = false;
@@ -427,6 +425,15 @@
         
     _getItemHoverRegion: function(item, event) {
       var self = this;
+      
+      var pos = self.element.offset();
+      console.log(self.element[0].clientHeight);
+      if( event.pageX < pos.left || event.pageY < pos.top )
+        return null;
+      if( event.pageX > (pos.left + self.element[0].clientWidth) ||
+          event.pageY > (pos.top + self.element[0].clientHeight ) )
+        return null;
+      
       var result = { top: false, bottom: false, left: false, right: false };
       var offset = item.offset();
       var w = item.outerWidth();
