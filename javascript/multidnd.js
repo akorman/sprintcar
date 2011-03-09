@@ -361,10 +361,11 @@
           
           // move the item that was mouse downed on to a state of selected
           var selectee = $(event.target).data("selectable-item");
-          selectee.$element.addClass('ui-selected');
-          selectee.selected = true;
-          self.selection_stack.push(selectee.element);
-          
+          if( selectee ) {
+            selectee.$element.addClass('ui-selected');
+            selectee.selected = true;
+            self.selection_stack.push(selectee.element);
+          }
         // mouse up on an already selected item
         } else if ($(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // everything that was already selected should be put in state of unselected
