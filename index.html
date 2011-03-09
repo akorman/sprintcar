@@ -8,30 +8,17 @@
   
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-      $('#list').multidnd({
+      $('#list').sprintcar({
         update: function(event, data) {
-          console.log("update");
-          console.log(event);
-          console.log(data);
-          console.log($('#list').multidnd('serialize'));
+          //alert("Updated order (serialized list follows): " + $('#list').sprintcar('serialize'));
         }
       });
-      //       $( "#list" ).sortable();
-      // $( "#list" ).disableSelection();
       $( "#droppable" ).droppable({
-            tolerance: "touch",
-            drop: function( event, ui ) {
-              console.log("drop callback");
-              console.log(event);
-              console.log(ui);
-              console.log(this);
-              console.log(ui.draggable);
-              $( this )
-                .addClass( "ui-state-highlight" )
-                .find( "p" )
-                  .html( "Dropped!" );
-            }
-          });
+        tolerance: "touch",
+        drop: function( event, ui ) {
+          $( this ).addClass( "ui-state-highlight" ).find( "p" ).html( "Dropped!" );
+        }
+      });
     });
   </script>
   

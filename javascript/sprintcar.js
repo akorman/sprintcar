@@ -27,7 +27,7 @@
  *  jquery.ui.widget.js
  */
 (function($) {
-  $.widget("ui.multidnd", $.ui.mouse, {
+  $.widget("ui.sprintcar", $.ui.mouse, {
     options: {
       appendTo: 'body',
       autoRefresh: true,
