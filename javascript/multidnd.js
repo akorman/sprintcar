@@ -253,7 +253,6 @@
     		if(this.options.scroll) {
     			var o = this.options, scrolled = false;
     			if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
-            console.log("Case 1");
 
     				if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
     					this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
@@ -266,7 +265,6 @@
     					this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
 
     			} else {
-            console.log("Case 2");
     				if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
     					scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
     				else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
@@ -426,13 +424,16 @@
     _getItemHoverRegion: function(item, event) {
       var self = this;
       
-      var pos = self.element.offset();
-      console.log(self.element[0].clientHeight);
-      if( event.pageX < pos.left || event.pageY < pos.top )
+      var sp = self.element.scrollParent();
+      var pos = sp.offset();
+      
+      if ((event.pageX < pos.left) || (event.pageY < pos.top)) {
         return null;
-      if( event.pageX > (pos.left + self.element[0].clientWidth) ||
-          event.pageY > (pos.top + self.element[0].clientHeight ) )
+      }
+      
+      if ((event.pageX > (pos.left + sp.width())) || (event.pageY > (pos.top + sp.height()))) {
         return null;
+      }
       
       var result = { top: false, bottom: false, left: false, right: false };
       var offset = item.offset();
