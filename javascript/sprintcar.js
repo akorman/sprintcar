@@ -56,9 +56,6 @@
       $("body").append(self.options.insert_pos_identifier);
       self.options.insert_pos_identifier.hide();
       self.options.insert_pos_identifier.css("position","absolute");
-      self.options.insert_pos_identifier.css("width", self.element.width());
-      self.options.insert_pos_identifier.css("left", self.element.position().left);
-      this.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
       
       this.dragged = false;
       this.possible_nonselected_drag = false;
@@ -92,6 +89,10 @@
             $(this).addClass('ui-selectee');
           }
         });
+        
+        self.options.insert_pos_identifier.css("width", self.selectees.eq(0).outerWidth());
+        self.options.insert_pos_identifier.css("left", self.selectees.eq(0).offset().left);
+        self.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
       };
       this.refresh();
       this._mouseInit();
@@ -333,7 +334,7 @@
           this.currentItem = this.helper;
   
           //Get the next scrolling parent
-          this.scrollParent = this.element.scrollParent();
+          this.scrollParent = this.selectees.eq(0).scrollParent();
           
           //Prepare scrolling
           if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML')
@@ -424,7 +425,7 @@
     _getItemHoverRegion: function(item, event) {
       var self = this;
       
-      var sp = self.element.scrollParent();
+      var sp = self.scrollParent;
       var pos = sp.offset();
       
       if ((event.pageX < pos.left) || (event.pageY < pos.top)) {
