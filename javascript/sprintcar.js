@@ -543,7 +543,7 @@
       if ($.browser.mozilla) {
         self.element.css({ 'MozUserSelect' : 'none' });
       } else if ($.browser.msie) {
-        self.element.bind('selectsstart.disableTextSelect', function() { return false; });
+        self.element.bind('selectstart.disableTextSelect', function() { return false; });
       } else {
         self.element.bind('mousedown.disableTextSelect', function() { return false; });
       }
