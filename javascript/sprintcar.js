@@ -566,7 +566,7 @@
         var selectee = $.data(this, "selectable-item");
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
-        self._trigger("unselected", event, {
+        self._trigger("unselected", null, {
           unselected: selectee.element
         });
         var idx = $.inArray(selectee.element,self.selection_stack);
