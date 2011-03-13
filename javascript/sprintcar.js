@@ -63,7 +63,8 @@
     _create: function() {
       var self = this;
       
-      self._disableTextSelect();
+      // Disable text selection for the jquery object this plugin is bound to
+      self._disable_text_selection(self.element);
       
       this.element.addClass("ui-selectable");
       self.options.insert_pos_identifier.addClass("insert-pos-identifier");
@@ -554,25 +555,29 @@
       return str.join('&');
     },
     
-    _disableTextSelect: function() {
-      var self = this;
+    /*
+     * Disable text selection for the jquery object passed in.
+     */
+    _disable_text_selection: function(e) {
       if ($.browser.mozilla) {
-        self.element.css({ 'MozUserSelect' : 'none' });
+        e.css({ 'MozUserSelect' : 'none' });
       } else if ($.browser.msie) {
-        self.element.bind('selectstart.disableTextSelect', function() { return false; });
+        e.bind('selectstart.disableTextSelect', function() { return false; });
       } else {
-        self.element.bind('mousedown.disableTextSelect', function() { return false; });
+        e.bind('mousedown.disableTextSelect', function() { return false; });
       }
     },
     
-    _enableTextSelect: function() {
-      var self = this;
+    /*
+     * Enable text selection for the jquery object passed in.
+     */
+    _enable_text_selection: function(e) {
       if ($.browser.mozilla) {
-        self.element.css({ 'MozUserSelect' : '' });
+        e.css({ 'MozUserSelect' : '' });
       } else if ($.browser.msie) {
-        self.element.unbind('selectstart.disableTextSelect');
+        e.unbind('selectstart.disableTextSelect');
       } else {
-        self.element.unbind('mousedown.disableTextSelect');
+        e.unbind('mousedown.disableTextSelect');
       }
     },
     
