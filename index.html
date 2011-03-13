@@ -32,7 +32,7 @@
       position: relative; /* this is required for IE 8 to detect the container as a scrollParent() */
     }
     
-    #list > div {
+    .ui-selectee {
       border-radius: 5px;
       background-color: #fcfcfc;
       padding-left: 20px;
@@ -42,19 +42,19 @@
       margin-bottom: 2px;
     }
     
-    #list > div.ui-selecting {
+    .ui-selectee.ui-selecting {
       background-color: yellow;
     }
     
-    #list > div.ui-unselecting {
+    .ui-selectee.ui-unselecting {
       background-color: orange;
     }
     
-    #list > div.ui-selected {
+    .ui-selectee.ui-selected {
       background-color: #b5d5ff;
     }
     
-    #list > div.ui-selectee-hidden {
+    .ui-selectee.ui-selectee-hidden {
       visibility: hidden;
     }
     
@@ -104,7 +104,7 @@
     <div id='task_32'>Take out the garbage</div>
     <div id='task_33'>Wash the car</div>
     <div id='task_34'>Clean out the garage and organize the tools</div>
-    <div id='task_35'>Put new grass in the backyard</div>                  
+    <div id='task_35'>Put new grass in the backyard</div>
   </div>
 <div id="droppable" class="ui-widget-header">
   <p>Drop here</p>
