@@ -468,7 +468,7 @@
       if( nonselected_drag ) {
         offset = $(dragee).offset();
         clone = $(dragee).clone(true);
-        clone = $('<ul></ul>').append(clone);
+        clone = $('<div></div>').append(clone);
       }
       else {
         // set offset to the offset of the first selected element
@@ -479,7 +479,7 @@
         // then try and remove the helper later in code it triggers the
         // destroy method on this object in turn removing all the state and
         // applied classes rendering the plugin useless.
-        clone = $('<ul></ul>');
+        clone = $('<div></div>');
         self.element.children().each(function() {
           clone.append($(this).clone(true));
         });
