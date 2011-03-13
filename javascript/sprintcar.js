@@ -468,7 +468,7 @@
       if( nonselected_drag ) {
         offset = $(dragee).offset();
         clone = $(dragee).clone(true);
-        clone = $('<ul></ul>').append(clone);
+        clone = $('<div></div>').append(clone);
       }
       else {
         // set offset to the offset of the first selected element
