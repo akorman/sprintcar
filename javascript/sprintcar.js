@@ -291,11 +291,10 @@
         this.helper.css('top', (cur_helper_pos.top + new_offset.top));
         this.helper.css('left', (cur_helper_pos.left + new_offset.left));
         
-        
         this.selectees.each(function(i, item) {
           var hover_region = self._getItemHoverRegion($(this), event);
           var dir = self._getDragVerticalDirection();
-          
+          console.log(dir);
           if( hover_region ) {
             self.current_item_hovered = $(item);
             var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
@@ -317,6 +316,14 @@
               self.current_item_hovered_region = hover_region;              
               insert_pos_identifier.show();
             }
+          }
+          else {
+            var region = { top: false, bottom: false };
+            if( dir == "up" )
+              region.top = true;
+            if( dir == "down" )
+              region.bottom = true;
+            self.current_item_hovered_region = region;
           }
         });
         
@@ -426,7 +433,7 @@
         
     _getItemHoverRegion: function(item, event) {
       var self = this;
-      
+
       var sp = self.scrollParent;
       var pos = sp.offset();
       
@@ -458,7 +465,7 @@
     
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
-      return delta != 0 && (delta > 0 ? "down" : "up");
+      return (delta > 0 ? "down" : "up");
     },
     
     _createHelper: function(nonselected_drag, dragee) {
