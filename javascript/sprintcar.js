@@ -309,7 +309,6 @@
         this.selectees.each(function(i, item) {
           var hover_region = self._getItemHoverRegion($(this), event);
           var dir = self._getDragVerticalDirection();
-          console.log(dir);
           if( hover_region ) {
             self.current_item_hovered = $(item);
             var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
