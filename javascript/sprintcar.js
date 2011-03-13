@@ -479,9 +479,9 @@
         // then try and remove the helper later in code it triggers the
         // destroy method on this object in turn removing all the state and
         // applied classes rendering the plugin useless.
-        clone = $('<ul></ul>');
+        clone = $('<div></div>');
         self.element.children().each(function() {
-          clone.append($(this).clone(true));
+          $(this).clone(true).appendTo(clone);
         });
         
         clone.find('.ui-selected').first().prevAll().remove();
