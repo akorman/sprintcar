@@ -46,6 +46,20 @@
       hover_region_threshold: (1.0 / 3.0)
     },
     
+    /*
+     * Construct the Sprintcar jquery-ui plugin on selector(s).
+     *
+     * This method constructs the plugin instance and it will be called once
+     * for each unique selector instance in the selector set. Ex:
+     *
+     * $('#list').sprintcar({
+     *   update: function(event, data) {
+     *     alert("Updated order (serialized list follows): " + $('#list').sprintcar('serialize'));
+     *   }
+     * });
+     *
+     * For the above example _create() would only be called once for $("#list").
+     */
     _create: function() {
       var self = this;
       
