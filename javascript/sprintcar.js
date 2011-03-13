@@ -149,9 +149,11 @@
       } else if (!$(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on a non-selected item
         // move the item that was meta mouse downed to a state of selected
         selectee = $(event.target).data("selectable-item");
-        selectee.$element.addClass('ui-selected');
-        selectee.selected = true;
-        self.selection_stack.push(selectee.element);
+        if( selectee ) {
+          selectee.$element.addClass('ui-selected');
+          selectee.selected = true;
+          self.selection_stack.push(selectee.element);
+        }
       } else if ($(event.target).hasClass('ui-selected') && event.metaKey) { // meta mouse down on an already selected item 
         // move the item that was meta mouse downed to a state of unselecting
         selectee = $(event.target).data("selectable-item");
