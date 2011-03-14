@@ -153,7 +153,10 @@
       return self;
     },
     
-    _pass_drag_threshold: function(event) {
+    /*
+     * Returns boolean identifying if mouse event has passed drag threshold.
+     */
+    _passed_drag_threshold: function(event) {
       return (Math.max(
           Math.abs(this.opos[0] - event.pageX),
           Math.abs(this.opos[1] - event.pageY)
@@ -364,7 +367,7 @@
         if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
         
       } else { // have NOT initialized dragging
-        if (this._pass_drag_threshold(event)) {
+        if (this._passed_drag_threshold(event)) {
           this.dragged = true;
           
           this.selectees.each(function(idx) {
