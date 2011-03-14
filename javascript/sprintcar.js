@@ -358,14 +358,6 @@
               insert_pos_identifier.show();
             }
           }
-          else {
-            var region = { top: false, bottom: false };
-            if( dir == "up" )
-              region.top = true;
-            if( dir == "down" )
-              region.bottom = true;
-            self.current_item_hovered_region = region;
-          }
         });
         
         //Interconnect with droppables
@@ -410,31 +402,33 @@
       
       if (self.dragged) {
         if( self._insideWidget() ) {
-          var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-          var orig_selectees_to_rem = [];
-          helperSelectees.each(function() {
-            var index = $(this).data('multidnd-index');
-            var origSelectee = self.selectees.filter(function() {
-              return ($(this).data('multidnd-index') == index);
+          if( self.current_item_hovered_region ) {          
+            var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
+            var orig_selectees_to_rem = [];
+            helperSelectees.each(function() {
+              var index = $(this).data('multidnd-index');
+              var origSelectee = self.selectees.filter(function() {
+                return ($(this).data('multidnd-index') == index);
+              });
+              origSelectee.hide();
+              orig_selectees_to_rem.push(origSelectee);
             });
-            origSelectee.hide();
-            orig_selectees_to_rem.push(origSelectee);
-          });
           
-          if( self.current_item_hovered_region.top ) {
-            helperSelectees.insertBefore(self.current_item_hovered);
-          }
-          else if( self.current_item_hovered_region.bottom ) {
-            helperSelectees.insertAfter(self.current_item_hovered);            
-          }
-          $(orig_selectees_to_rem).each(function () {
-            this.remove();
-          });
+            if( self.current_item_hovered_region.top ) {
+              helperSelectees.insertBefore(self.current_item_hovered);
+            }
+            else if( self.current_item_hovered_region.bottom ) {
+              helperSelectees.insertAfter(self.current_item_hovered);            
+            }
+            $(orig_selectees_to_rem).each(function () {
+              this.remove();
+            });
           
-          $.ui.ddmanager.current = null;
-          self.refresh();
-          self._unselect_all_selected(self.selectees.filter('.ui-selected'));
-          self._trigger('update', event, this._uiHash());
+            $.ui.ddmanager.current = null;
+            self.refresh();
+            self._unselect_all_selected(self.selectees.filter('.ui-selected'));
+            self._trigger('update', event, this._uiHash());
+          }
         } else {
           //If we are using droppables, inform the manager about the drop
           if ($.ui.ddmanager)
