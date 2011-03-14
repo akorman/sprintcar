@@ -171,6 +171,11 @@
       };
     },
     
+    /*
+     * Called when the mouse down happens.
+     *
+     * Called by the ui.mouse jquery ui plugin that this plugin extends.
+     */
     _mouseStart: function(event) {
       var self = this;
       var selectee;
@@ -285,6 +290,11 @@
       }
     },
     
+    /*
+     * Called when the mouse drag happens.
+     *
+     * Called by the ui.mouse jquery ui plugin that this plugin extends.
+     */    
     _mouseDrag: function(event) {
       var self = this;
       var dragee = self.element.data("dragee");
@@ -397,6 +407,11 @@
       return false;
     },
     
+    /*
+     * Called when the mouse up happens.
+     *
+     * Called by the ui.mouse jquery ui plugin that this plugin extends.
+     */
     _mouseStop: function(event) {
       var self = this;
       var options = this.options;
