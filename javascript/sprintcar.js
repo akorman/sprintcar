@@ -124,19 +124,33 @@
       
       self.refresh();
       self._mouseInit();
+      
+      return self;
     },
     
+    /*
+     * Destruct the plugin.
+     *
+     * This method is called when the plugin is explicitly destructed or when
+     * the element it is bound to is removed from the dom. It is responsible
+     * for basically putting the element that the plugin was bound to and all
+     * children it touches back in the state they would have been if the
+     * plugin had not been initialized on the element. In general this is
+     * simply removing classes and data from managed elements.
+     */
     destroy: function() {
-      this.selectees
+      var self = this;
+      
+      self.selectees
         .removeClass("ui-selectee")
         .removeData("selectable-item");
-      this.element
+      self.element
         .removeClass("ui-selectable ui-selectable-disabled")
         .removeData("selectable")
         .unbind(".selectable");
-      this._mouseDestroy();
+      self._mouseDestroy();
       
-      return this;
+      return self;
     },
     
     _pass_drag_threshold: function(event) {
