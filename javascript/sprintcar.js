@@ -66,14 +66,10 @@
       // Disable text selection for the jquery object this plugin is bound to
       self._disable_text_selection(self.element);
       
-      this.element.addClass("ui-selectable");
-      self.options.insert_pos_identifier.addClass("insert-pos-identifier");
-      $("body").append(self.options.insert_pos_identifier);
-      self.options.insert_pos_identifier.hide();
-      self.options.insert_pos_identifier.css("position","absolute");
+      self.element.addClass("ui-selectable");
       
-      this.dragged = false;
-      this.possible_nonselected_drag = false;
+      self.dragged = false;
+      self.possible_nonselected_drag = false;
       self.selection_stack = [];
       self.current_item_hovered = null;
       self.current_item_hovered_region = null;
@@ -82,35 +78,52 @@
       if( self.options.hover_region_threshold > 0.5 )
         self.options.hover_region_threshold = 0.5;
       
-      // cache selectee children based on filter
-      this.refresh = function() {
-        this.selectees = $(self.options.filter, self.element[0]);
+      /*
+       * Refresh the plugins knowledge of what it is responsible for managing.
+       *
+       * This method is designed to be called in scenarios where you change
+       * elements that the plugin is currently managing. For example, lets
+       * say you called the plugin on page load and initialized sprintcar on
+       * a list of items. Then through some user action a new item gets added
+       * to that list. Now, that an external entity has added an item to the
+       * area sprintcar is managing you need to tell sprintcar to refresh
+       * itself and find any new elements it may need to manage.
+       */
+      self.refresh = function() {
+        this.selectees = $(this.options.filter, this.element[0]);
         this.selectees.each(function() {
-          var $this = $(this);
-          var pos = $this.offset();
-          $.data(this, "selectable-item", {
-            element: this,
-            $element: $this,
-            left: pos.left,
-            top: pos.top,
-            right: pos.left + $this.outerWidth(),
-            bottom: pos.top + $this.outerHeight(),
+          var cur_selectee = $(this);
+          var cur_selectee_pos = cur_selectee.offset();
+          $.data(cur_selectee[0], "selectable-item", {
+            element: cur_selectee[0],
+            $element: cur_selectee,
+            left: cur_selectee_pos.left,
+            top: cur_selectee_pos.top,
+            right: cur_selectee_pos.left + cur_selectee.outerWidth(),
+            bottom: cur_selectee_pos.top + cur_selectee.outerHeight(),
             startselected: false,
-            selected: $this.hasClass('ui-selected'),
-            selecting: $this.hasClass('ui-selecting'),
-            unselecting: $this.hasClass('ui-unselecting')
+            selected: cur_selectee.hasClass('ui-selected'),
+            selecting: cur_selectee.hasClass('ui-selecting'),
+            unselecting: cur_selectee.hasClass('ui-unselecting')
           });
-          if( !$(this).hasClass('ui-selectee') ) {
-            $(this).addClass('ui-selectee');
+          if( !cur_selectee.hasClass('ui-selectee') ) {
+            cur_selectee.addClass('ui-selectee');
           }
         });
         
+        // Add insertion position identifier to the dom and style it in prep
+        // for use later on
+        self.options.insert_pos_identifier.addClass("insert-pos-identifier");
+        $("body").append(self.options.insert_pos_identifier);
+        self.options.insert_pos_identifier.hide();
+        self.options.insert_pos_identifier.css("position","absolute");
         self.options.insert_pos_identifier.css("width", self.selectees.eq(0).outerWidth());
         self.options.insert_pos_identifier.css("left", self.selectees.eq(0).offset().left);
         self.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
       };
-      this.refresh();
-      this._mouseInit();
+      
+      self.refresh();
+      self._mouseInit();
     },
     
     destroy: function() {
