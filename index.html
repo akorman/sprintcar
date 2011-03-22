@@ -1,81 +1,113 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-
-  <title>cyphactor/sprintcar @ GitHub</title>
-
-  <style type="text/css">
+  <script type="text/javascript" src="javascript/jquery-1.4.4.min.js"></script>  
+  <script type="text/javascript" src="javascript/jquery-ui-1.8.9.custom.min.js"></script>
+  <script type="text/javascript" src="javascript/sprintcar.js"></script>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <title>index</title>
+  
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      $('#list').sprintcar({
+        update: function(event, data) {
+          //alert("Updated order (serialized list follows): " + $('#list').sprintcar('serialize'));
+        }
+      });
+      $( "#droppable" ).droppable({
+        tolerance: "touch",
+        drop: function( event, ui ) {
+          $( this ).addClass( "ui-state-highlight" ).find( "p" ).html( "Dropped!" );
+        }
+      });
+    });
+  </script>
+  
+  <style type="text/css" media="screen">
+    #list {
+      width: 885px;
+      height: 200px;
+      overflow: scroll;
+      padding: 10px;
+      background-color: #babec7;
+      position: relative; /* this is required for IE 8 to detect the container as a scrollParent() */
+    }
+    
+    .ui-selectee {
+      border-radius: 5px;
+      background-color: #fcfcfc;
+      padding-left: 20px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+    
+    .ui-selectee.ui-selecting {
+      background-color: yellow;
+    }
+    
+    .ui-selectee.ui-unselecting {
+      background-color: orange;
+    }
+    
+    .ui-selectee.ui-selected {
+      background-color: #b5d5ff;
+    }
+    
+    .ui-selectee.ui-selectee-hidden {
+      visibility: hidden;
+    }
+    
+    #droppable { width: 150px; height: 150px; padding: 0.5em; margin: 10px; background-color: orange; }    
+    
     body {
-      margin-top: 1.0em;
-      background-color: #333333;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+      font-family: Arial;
+      font-size: 12px;
+      margin: 0px;
+      padding: 0px;
     }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #be6b90; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #be6b90; }
-    h3 { text-align: center; color: #be6b90; }
-    a { color: #be6b90; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
   </style>
 </head>
-
-<body>
-  <a href="http://github.com/cyphactor/sprintcar"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/cyphactor/sprintcar/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/cyphactor/sprintcar/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/cyphactor/sprintcar">sprintcar</a>
-      <span class="small">by <a href="http://github.com/cyphactor">cyphactor</a></span></h1>
-
-    <div class="description">
-      jQuery UI Multi-Select Drag & Drop Plugin
-    </div>
-
-    <h2>Authors</h2>
-<p>Andrew De Ponte (cyphactor@gmail.com)
-<br/>David Ibbitson (david.ibbitson@gmail.com)
-<br/>
-<br/>      </p>
-<h2>Contact</h2>
-<p>Andrew De Ponte (cyphactor@gmail.com)
-<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/cyphactor/sprintcar/zipball/master">zip</a> or
-      <a href="http://github.com/cyphactor/sprintcar/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/cyphactor/sprintcar</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/cyphactor/sprintcar">cyphactor/sprintcar</a>
-    </div>
-
+<body id="index" onload="">
+  <div id="list">
+    <div id='task_1'>Mow the lawn</div>
+    <div id='task_2'>Paint the outside of the House</div>
+    <div id='task_3'>Run copper pipes down the front bathroom</div>
+    <div id='task_4'>Take out the garbage</div>
+    <div id='task_5'>Wash the car</div>
+    <div id='task_6'>Clean out the garage and organize the tools</div>
+    <div id='task_7'>Put new grass in the backyard</div>
+    <div id='task_8'>Mow the lawn</div>
+    <div id='task_9'>Paint the outside of the House</div>
+    <div id='task_10'>Run copper pipes down the front bathroom</div>
+    <div id='task_11'>Take out the garbage</div>
+    <div id='task_12'>Wash the car</div>
+    <div id='task_13'>Clean out the garage and organize the tools</div>
+    <div id='task_14'>Put new grass in the backyard</div>
+    <div id='task_15'>Mow the lawn</div>
+    <div id='task_16'>Paint the outside of the House</div>
+    <div id='task_17'>Run copper pipes down the front bathroom</div>
+    <div id='task_18'>Take out the garbage</div>
+    <div id='task_19'>Wash the car</div>
+    <div id='task_20'>Clean out the garage and organize the tools</div>
+    <div id='task_21'>Put new grass in the backyard</div>
+    <div id='task_22'>Mow the lawn</div>
+    <div id='task_23'>Paint the outside of the House</div>
+    <div id='task_24'>Run copper pipes down the front bathroom</div>
+    <div id='task_25'>Take out the garbage</div>
+    <div id='task_26'>Wash the car</div>
+    <div id='task_27'>Clean out the garage and organize the tools</div>
+    <div id='task_28'>Put new grass in the backyard</div>
+    <div id='task_29'>Mow the lawn</div>
+    <div id='task_30'>Paint the outside of the House</div>
+    <div id='task_31'>Run copper pipes down the front bathroom</div>
+    <div id='task_32'>Take out the garbage</div>
+    <div id='task_33'>Wash the car</div>
+    <div id='task_34'>Clean out the garage and organize the tools</div>
+    <div id='task_35'>Put new grass in the backyard</div>
   </div>
-
-  
+<div id="droppable" class="ui-widget-header">
+  <p>Drop here</p>
+</div>
 </body>
 </html>
