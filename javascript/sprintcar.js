@@ -31,6 +31,7 @@
     options: {
       appendTo: 'body',
       autoRefresh: true,
+      connectWith: false,
       threshold: 10,
       distance: 0, // NOTE WE HAVE TO HAVE THIS TO HANDLE THRESHOLD DON'T CHANGE
       helper: "original",
@@ -127,6 +128,13 @@
       
       return self;
     },
+    
+    _connectWith: function() {
+  		var options = this.options;
+  		return options.connectWith.constructor == String
+  			? [options.connectWith]
+  			: options.connectWith;
+  	},
     
     /*
      * Destruct the plugin.
