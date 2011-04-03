@@ -427,7 +427,7 @@
       var insert_pos_identifier = self.element.data("insert_pos_identifier");
       
       if (self.dragged) {
-        if( self._insideWidget() ) {
+        if( self._insideWidget(self.positionAbs) ) {
           if( self.current_item_hovered_region ) {          
             var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
             var orig_selectees_to_rem = [];
@@ -568,14 +568,14 @@
       return container;
     },
     
-    _insideWidget: function() {
+    _insideWidget: function(pos) {
       var contPos = this.element.offset();
       var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
       
-      if( this.positionAbs.top > contPos.top &&
-          this.positionAbs.left > contPos.left &&
-          this.positionAbs.top < (contPos.top + contDim.height) &&
-          this.positionAbs.left < (contPos.left + contDim.width) )
+      if( pos.top > contPos.top &&
+          pos.left > contPos.left &&
+          pos.top < (contPos.top + contDim.height) &&
+          pos.left < (contPos.left + contDim.width) )
       {
           return true;
       }
