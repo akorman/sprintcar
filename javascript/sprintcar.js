@@ -431,6 +431,8 @@
               origSelectee.hide();
               orig_selectees_to_rem.push(origSelectee);
             });
+
+            self._unselect_all_selected(self.selectees);
           
             if( self.current_item_hovered_region.top ) {
               helperSelectees.insertBefore(self.current_item_hovered);
@@ -444,7 +446,8 @@
           
             $.ui.ddmanager.current = null;
             self.refresh();
-            self._unselect_all_selected(self.selectees.filter('.ui-selected'));
+            //self._unselect_all_selected(self.selectees);
+            self._populate_selection_stack_with_selected(self.selectees);
             self._trigger('update', event, this._uiHash());
           }
         } else {
@@ -463,7 +466,7 @@
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // move all items that were previously selected to a state of unselected
-          self._unselect_all_selected(self.selectees.filter('.ui-selected'));
+          self._unselect_all_selected(self.selectees);
           
           // move the item that was mouse downed on to a state of selected
           var selectee = $(event.target).data("selectable-item");
@@ -475,7 +478,7 @@
         // mouse up on an already selected item
         } else if ($(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // everything that was already selected should be put in state of unselected
-          self._unselect_all_selected(this.selectees.filter('.ui-selected').not($(event.target)));
+          self._unselect_all_selected(this.selectees.not($(event.target)));
         }
       }
       this.possible_nonselected_drag = false;
@@ -629,7 +632,7 @@
     _unselect_all_selected: function(objs) {
       var self = this;
       
-      objs.each(function() {
+      objs.filter('.ui-selected').each(function() {
         var selectee = $.data(this, "selectable-item");
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
@@ -641,6 +644,15 @@
           self.selection_stack.splice(idx,1);
         }
       });
+    },
+    
+    _populate_selection_stack_with_selected: function(objs) {
+      var self = this;
+      objs.filter('.ui-selected').each(function() {
+        var selectee = $.data(this, "selectable-item");
+        self.selection_stack.push(selectee.element);
+      });
     }
+    
   });
 })(jQuery);
