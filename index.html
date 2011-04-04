@@ -9,6 +9,7 @@
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
       $('#list, #list2').sprintcar({
+        connectWith: ".list",
         update: function(event, data) {
           //alert("Updated order (serialized list follows): " + $('#list').sprintcar('serialize'));
         }
@@ -69,7 +70,7 @@
   </style>
 </head>
 <body id="index" onload="">
-  <div id="list">
+  <div id="list" class="list">
     <div id='task_1'>Mow the lawn</div>
     <div id='task_2'>Paint the outside of the House</div>
     <div id='task_3'>Run copper pipes down the front bathroom</div>
@@ -106,7 +107,7 @@
     <div id='task_34'>Clean out the garage and organize the tools</div>
     <div id='task_35'>Put new grass in the backyard</div>
   </div>
-  <div id="list2">
+  <div id="list2" class="list">
     <div id='task_1'>a</div>
     <div id='task_2'>b</div>
     <div id='task_3'>c</div>

@@ -72,6 +72,7 @@
       self.dragged = false;
       self.possible_nonselected_drag = false;
       self.selection_stack = [];
+      self.containers = null;
       self.current_item_hovered = null;
       self.current_item_hovered_region = null;
       
@@ -121,6 +122,10 @@
         self.options.insert_pos_identifier.css("width", self.selectees.eq(0).outerWidth());
         self.options.insert_pos_identifier.css("left", self.selectees.eq(0).offset().left);
         self.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
+        
+    		if(self.options.connectWith != false) {
+          self.containers = $(self.options.connectWith).not(self.element);
+    		}
       };
       
       self.refresh();
@@ -128,14 +133,7 @@
       
       return self;
     },
-    
-    _connectWith: function() {
-  		var options = this.options;
-  		return options.connectWith.constructor == String
-  			? [options.connectWith]
-  			: options.connectWith;
-  	},
-    
+        
     /*
      * Destruct the plugin.
      *
@@ -315,71 +313,82 @@
       this.positionAbs = { top: event.pageY, left: event.pageX };
       
       if (this.dragged) { // have already initialized dragging
-        //Do scrolling
-        if(this.options.scroll) {
-          var o = this.options, scrolled = false;
-          if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
+      
+        if( self.insideWidget(self.positionAbs) ) {
+          //Do scrolling
+          if(this.options.scroll) {
+            var o = this.options, scrolled = false;
+            if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
 
-            if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
-              this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
-            else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
-              this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+              if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
+                this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+              else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
+                this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
 
-            if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
-              this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
-            else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
-              this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+              if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
+                this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+              else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
+                this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
 
-          } else {
-            if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
-              scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
-            else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
-              scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+            } else {
+              if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
+                scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+              else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
+                scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
 
-            if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
-              scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
-            else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
-              scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+              if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
+                scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+              else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
+                scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
 
+            }
+
+            if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
+              $.ui.ddmanager.prepareOffsets(this, event);
           }
 
-          if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
-            $.ui.ddmanager.prepareOffsets(this, event);
+          this.selectees.each(function(i, item) {
+            var hover_region = self._getItemHoverRegion($(this), event);
+            var dir = self._getDragVerticalDirection();
+            if( hover_region ) {
+              self.current_item_hovered = $(item);
+              var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
+              var offset = margin / 2;
+
+              if( hover_region.top && dir == "up" ) {
+                insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+              }
+              else if( hover_region.top && dir == "down" ) {
+                insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+              }
+              else if( hover_region.bottom && dir == "down" ) {
+                insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
+              }
+              else if( hover_region.bottom && dir == "up" ) {
+                insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
+              }
+              if( hover_region.top || hover_region.bottom ) {
+                self.current_item_hovered_region = hover_region;              
+                insert_pos_identifier.show();
+              }
+            }
+          });        
         }
-     
+        else {
+          self.containers.each(function() {
+            if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
+            }
+            else {
+            }
+          });
+        }    
+        
         // updated the helper by moving it the difference between the last
         // mouse position and the new mouse position.
         var cur_helper_pos = this.helper.offset();
         var new_offset = { top: (this.positionAbs.top - this.lastPositionAbs.top), left: (this.positionAbs.left - this.lastPositionAbs.left) };
         this.helper.css('top', (cur_helper_pos.top + new_offset.top));
-        this.helper.css('left', (cur_helper_pos.left + new_offset.left));
-        
-        this.selectees.each(function(i, item) {
-          var hover_region = self._getItemHoverRegion($(this), event);
-          var dir = self._getDragVerticalDirection();
-          if( hover_region ) {
-            self.current_item_hovered = $(item);
-            var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
-            var offset = margin / 2;
-            
-            if( hover_region.top && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-            }
-            else if( hover_region.top && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-            }
-            else if( hover_region.bottom && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
-            }
-            else if( hover_region.bottom && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
-            }
-            if( hover_region.top || hover_region.bottom ) {
-              self.current_item_hovered_region = hover_region;              
-              insert_pos_identifier.show();
-            }
-          }
-        });
+        this.helper.css('left', (cur_helper_pos.left + new_offset.left));        
         
         //Interconnect with droppables
         if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
@@ -427,7 +436,7 @@
       var insert_pos_identifier = self.element.data("insert_pos_identifier");
       
       if (self.dragged) {
-        if( self._insideWidget(self.positionAbs) ) {
+        if( self.insideWidget(self.positionAbs) ) {
           if( self.current_item_hovered_region ) {          
             var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
             var orig_selectees_to_rem = [];
@@ -568,7 +577,7 @@
       return container;
     },
     
-    _insideWidget: function(pos) {
+    insideWidget: function(pos) {
       var contPos = this.element.offset();
       var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
       
