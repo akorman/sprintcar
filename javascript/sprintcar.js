@@ -126,6 +126,13 @@
     		if(self.options.connectWith != false) {
           self.containers = $(self.options.connectWith).not(self.element);
     		}
+    		
+    		//Get the next scrolling parent
+        self.scrollParent = self.selectees.eq(0).scrollParent();
+        
+        //Prepare scrolling
+        if(self.scrollParent[0] != document && self.scrollParent[0].tagName != 'HTML')
+          self.overflowOffset = self.scrollParent.offset();  
       };
       
       self.refresh();
@@ -187,7 +194,10 @@
       var selectee;
       
       this.opos = [event.pageX, event.pageY];
-      this.positionAbs = { top: event.pageY, left: event.pageX };
+      self.containers.each(function() {
+        $(this).sprintcar("updateMousePosition", event)
+      });
+      self.updateMousePosition(event);
       
       if (this.options.disabled)
         return;
@@ -351,6 +361,8 @@
         else {
           self.containers.each(function() {
             if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
+              $(this).sprintcar("updateMousePosition", event)
+              $(this).sprintcar("updateInsertionPosition", event)
             }
             else {
             }
@@ -379,13 +391,6 @@
           this._cacheHelperProportions();
           this.currentItem = this.helper;
   
-          //Get the next scrolling parent
-          this.scrollParent = this.selectees.eq(0).scrollParent();
-          
-          //Prepare scrolling
-          if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML')
-            this.overflowOffset = this.scrollParent.offset();  
-          
           //Prepare possible droppables
           if($.ui.ddmanager) {
             $.ui.ddmanager.current = this;
@@ -478,9 +483,14 @@
       return false;
     },
     
+    updateMousePosition: function(event) {
+      this.lastPositionAbs = this.positionAbs;
+      this.positionAbs = { top: event.pageY, left: event.pageX };  
+    },
+    
     updateInsertionPosition: function(event) {
       var self = this;
-      var insert_pos_identifier = self.element.data("insert_pos_identifier");
+      var insert_pos_identifier = self.element.data("insert_pos_identifier");     
       this.selectees.each(function(i, item) {
         var hover_region = self._getItemHoverRegion($(this), event);
         var dir = self._getDragVerticalDirection();
@@ -511,9 +521,8 @@
         
     _getItemHoverRegion: function(item, event) {
       var self = this;
-
       var sp = self.scrollParent;
-      var pos = sp.offset();
+      var pos = sp.offset;
       
       if ((event.pageX < pos.left) || (event.pageY < pos.top)) {
         return null;
