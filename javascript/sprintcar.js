@@ -304,7 +304,6 @@
     _mouseDrag: function(event) {
       var self = this;
       var dragee = self.element.data("dragee");
-      var insert_pos_identifier = self.element.data("insert_pos_identifier");
       if( !dragee ) {
         return false;
       }
@@ -347,32 +346,7 @@
               $.ui.ddmanager.prepareOffsets(this, event);
           }
 
-          this.selectees.each(function(i, item) {
-            var hover_region = self._getItemHoverRegion($(this), event);
-            var dir = self._getDragVerticalDirection();
-            if( hover_region ) {
-              self.current_item_hovered = $(item);
-              var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
-              var offset = margin / 2;
-
-              if( hover_region.top && dir == "up" ) {
-                insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-              }
-              else if( hover_region.top && dir == "down" ) {
-                insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-              }
-              else if( hover_region.bottom && dir == "down" ) {
-                insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
-              }
-              else if( hover_region.bottom && dir == "up" ) {
-                insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
-              }
-              if( hover_region.top || hover_region.bottom ) {
-                self.current_item_hovered_region = hover_region;              
-                insert_pos_identifier.show();
-              }
-            }
-          });        
+          self.updateInsertionPosition(event);
         }
         else {
           self.containers.each(function() {
@@ -502,6 +476,37 @@
       this._trigger("stop", event);
       
       return false;
+    },
+    
+    updateInsertionPosition: function(event) {
+      var self = this;
+      var insert_pos_identifier = self.element.data("insert_pos_identifier");
+      this.selectees.each(function(i, item) {
+        var hover_region = self._getItemHoverRegion($(this), event);
+        var dir = self._getDragVerticalDirection();
+        if( hover_region ) {
+          self.current_item_hovered = $(item);
+          var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
+          var offset = margin / 2;
+
+          if( hover_region.top && dir == "up" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+          }
+          else if( hover_region.top && dir == "down" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+          }
+          else if( hover_region.bottom && dir == "down" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
+          }
+          else if( hover_region.bottom && dir == "up" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
+          }
+          if( hover_region.top || hover_region.bottom ) {
+            self.current_item_hovered_region = hover_region;              
+            insert_pos_identifier.show();
+          }
+        }
+      });
     },
         
     _getItemHoverRegion: function(item, event) {
