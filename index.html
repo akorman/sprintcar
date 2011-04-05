@@ -8,7 +8,7 @@
   
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
-      $('#list, #list2, #list3').sprintcar({
+      $('.list').sprintcar({
         connectWith: ".list",
         update: function(event, data, ui) {
           //alert("Updated order (serialized list follows): " + data);
@@ -24,11 +24,21 @@
   </script>
   
   <style type="text/css" media="screen">
-    #list, #list2, #list3 {
+    .list_header {
+      text-align: center;
+      color: #333333;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    
+    .list_container {
       width: 885px;
-      height: 200px;
+      height: 400px;
       overflow: scroll;
-      padding: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-bottom: 10px;
       background-color: #babec7;
       position: relative; /* this is required for IE 8 to detect the container as a scrollParent() */
     }
@@ -70,101 +80,38 @@
   </style>
 </head>
 <body id="index" onload="">
-  <div id="list" class="list">
-    <div id='task_1'>Mow the lawn</div>
-    <div id='task_2'>Paint the outside of the House</div>
-    <div id='task_3'>Run copper pipes down the front bathroom</div>
-    <div id='task_4'>Take out the garbage</div>
-    <div id='task_5'>Wash the car</div>
-    <div id='task_6'>Clean out the garage and organize the tools</div>
-    <div id='task_7'>Put new grass in the backyard</div>
-    <div id='task_8'>Mow the lawn</div>
-    <div id='task_9'>Paint the outside of the House</div>
-    <div id='task_10'>Run copper pipes down the front bathroom</div>
-    <div id='task_11'>Take out the garbage</div>
-    <div id='task_12'>Wash the car</div>
-    <div id='task_13'>Clean out the garage and organize the tools</div>
-    <div id='task_14'>Put new grass in the backyard</div>
-    <div id='task_15'>Mow the lawn</div>
-    <div id='task_16'>Paint the outside of the House</div>
-    <div id='task_17'>Run copper pipes down the front bathroom</div>
-    <div id='task_18'>Take out the garbage</div>
-    <div id='task_19'>Wash the car</div>
-    <div id='task_20'>Clean out the garage and organize the tools</div>
-    <div id='task_21'>Put new grass in the backyard</div>
-    <div id='task_22'>Mow the lawn</div>
-    <div id='task_23'>Paint the outside of the House</div>
-    <div id='task_24'>Run copper pipes down the front bathroom</div>
-    <div id='task_25'>Take out the garbage</div>
-    <div id='task_26'>Wash the car</div>
-    <div id='task_27'>Clean out the garage and organize the tools</div>
-    <div id='task_28'>Put new grass in the backyard</div>
-    <div id='task_29'>Mow the lawn</div>
-    <div id='task_30'>Paint the outside of the House</div>
-    <div id='task_31'>Run copper pipes down the front bathroom</div>
-    <div id='task_32'>Take out the garbage</div>
-    <div id='task_33'>Wash the car</div>
-    <div id='task_34'>Clean out the garage and organize the tools</div>
-    <div id='task_35'>Put new grass in the backyard</div>
+  <div class="list_container">
+    
+    <div class="list_header">Sod Backyard</div>
+    <div id="list1" class="list">
+      <div id='task_1'>Dig 4 inches deep</div>
+      <div id='task_2'>Put fresh soil with fertilizer</div>
+      <div id='task_3'>Soak the soil</div>
+      <div id='task_4'>Place sod appropriately over soil</div>
+      <div id='task_5'>Tamp the sod down</div>
+    </div>
+    
+    <div class="list_header">House Maintenance</div>
+    <div id="list2" class="list">
+      <div id='task_6'>Clean out the garage and organize the tools</div>
+      <div id='task_8'>Mow the lawn</div>
+      <div id='task_9'>Paint the outside of the House</div>
+      <div id='task_10'>Take out the garbage</div>
+      <div id='task_11'>Wash the car</div>
+    </div>
+
+    <div class="list_header">Personal</div>
+    <div id="list3" class="list">
+      <div id='task_12'>Wash my truck</div>
+      <div id='task_13'>Shave head</div>
+      <div id='task_14'>Clean the house</div>
+      <div id='task_15'>Take out the garbage</div>
+      <div id='task_16'>Sweep the backyard patio.</div>
+    </div>
   </div>
-  <div id="list2" class="list">
-    <div id='task_111'>a</div>
-    <div id='task_112'>b</div>
-    <div id='task_113'>c</div>
-    <div id='task_114'>d</div>
-    <div id='task_115'>e</div>
-    <div id='task_116'>f</div>
-    <div id='task_117'>g</div>
-    <div id='task_118'>h</div>
-    <div id='task_119'>i</div>
-    <div id='task_1110'>j</div>
-    <div id='task_1111'>k</div>
-    <div id='task_1112'>l</div>
-    <div id='task_1113'>m</div>
-    <div id='task_1114'>n</div>
-    <div id='task_1115'>o</div>
-    <div id='task_1116'>p</div>
-    <div id='task_1117'>q</div>
-    <div id='task_1118'>r</div>
-    <div id='task_1119'>s</div>
-    <div id='task_1120'>t</div>
-    <div id='task_1121'>u</div>
-    <div id='task_1122'>v</div>
-    <div id='task_1123'>w</div>
-    <div id='task_1124'>x</div>
-    <div id='task_1125'>y</div>
-    <div id='task_1126'>z</div>
-  </div>  
-  <div id="list3" class="list">
-    <div id='task_211'>a</div>
-    <div id='task_212'>b</div>
-    <div id='task_213'>c</div>
-    <div id='task_214'>d</div>
-    <div id='task_215'>e</div>
-    <div id='task_216'>f</div>
-    <div id='task_217'>g</div>
-    <div id='task_218'>h</div>
-    <div id='task_219'>i</div>
-    <div id='task_2110'>j</div>
-    <div id='task_2111'>k</div>
-    <div id='task_2112'>l</div>
-    <div id='task_2113'>m</div>
-    <div id='task_2114'>n</div>
-    <div id='task_2115'>o</div>
-    <div id='task_2116'>p</div>
-    <div id='task_2117'>q</div>
-    <div id='task_2118'>r</div>
-    <div id='task_2119'>s</div>
-    <div id='task_2120'>t</div>
-    <div id='task_2121'>u</div>
-    <div id='task_2122'>v</div>
-    <div id='task_2123'>w</div>
-    <div id='task_2124'>x</div>
-    <div id='task_2125'>y</div>
-    <div id='task_2126'>z</div>
-  </div>  
-<div id="droppable" class="ui-widget-header">
-  <p>Drop here</p>
-</div>
+  
+  <div id="droppable" class="ui-widget-header">
+    <p>Drop here</p>
+  </div>
 </body>
 </html>
