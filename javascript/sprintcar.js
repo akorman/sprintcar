@@ -195,9 +195,9 @@
       
       this.opos = [event.pageX, event.pageY];
       self.containers.each(function() {
-        $(this).sprintcar("updateMousePosition", event)
+        $(this).sprintcar("onExternalContainerMouseStart", event)
       });
-      self.updateMousePosition(event);
+      self._updateMousePosition(event);
       
       if (this.options.disabled)
         return;
@@ -325,16 +325,13 @@
       
         if( self.insideWidget(self.positionAbs) ) {
           //Do scrolling
-          self.updateScrollStatus(event);
-        
-          self.updateInsertionPosition(event);
+          self._updateScrollStatus(event);
+          self._updateInsertionPosition(event);
         }
         else {
           self.containers.each(function() {
             if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
-              $(this).sprintcar("updateScrollStatus", event);
-              $(this).sprintcar("updateMousePosition", event);
-              $(this).sprintcar("updateInsertionPosition", event);
+              $(this).sprintcar("onExternalContainerMouseDrag", event);
             }
             else {
             }
@@ -455,7 +452,19 @@
       return false;
     },
     
-    updateScrollStatus: function(event) {
+    onExternalContainerMouseStart: function(event) {
+      var self = this;
+      self._updateMousePosition(event);
+    },
+    
+    onExternalContainerMouseDrag: function(event) {
+      var self = this;
+      self._updateScrollStatus(event);
+      self._updateMousePosition(event);
+      self._updateInsertionPosition(event);
+    },
+    
+    _updateScrollStatus: function(event) {
       if(this.options.scroll) {
         var o = this.options, scrolled = false;
         if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
@@ -488,12 +497,12 @@
       }
     },
     
-    updateMousePosition: function(event) {
+    _updateMousePosition: function(event) {
       this.lastPositionAbs = this.positionAbs;
       this.positionAbs = { top: event.pageY, left: event.pageX };  
     },
     
-    updateInsertionPosition: function(event) {
+    _updateInsertionPosition: function(event) {
       var self = this;
       var insert_pos_identifier = self.element.data("insert_pos_identifier");     
       this.selectees.each(function(i, item) {
