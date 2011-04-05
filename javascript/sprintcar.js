@@ -31,6 +31,7 @@
     options: {
       appendTo: 'body',
       autoRefresh: true,
+      connectWith: false,
       threshold: 10,
       distance: 0, // NOTE WE HAVE TO HAVE THIS TO HANDLE THRESHOLD DON'T CHANGE
       helper: "original",
@@ -71,12 +72,14 @@
       self.dragged = false;
       self.possible_nonselected_drag = false;
       self.selection_stack = [];
+      self.containers = null;
       self.current_item_hovered = null;
       self.current_item_hovered_region = null;
       
       // ensure hover_region_threshold is a sensible value.
-      if( self.options.hover_region_threshold > 0.5 )
+      if( self.options.hover_region_threshold > 0.5 ) {
         self.options.hover_region_threshold = 0.5;
+      }
       
       /*
        * Refresh the plugins knowledge of what it is responsible for managing.
@@ -120,6 +123,18 @@
         self.options.insert_pos_identifier.css("width", self.selectees.eq(0).outerWidth());
         self.options.insert_pos_identifier.css("left", self.selectees.eq(0).offset().left);
         self.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
+        
+    		if(self.options.connectWith !== false) {
+          self.containers = $(self.options.connectWith).not(self.element);
+    		}
+    		
+    		//Get the next scrolling parent
+        self.scrollParent = self.selectees.eq(0).scrollParent();
+        
+        //Prepare scrolling
+        if(self.scrollParent[0] != document && self.scrollParent[0].tagName != 'HTML') {
+          self.overflowOffset = self.scrollParent.offset();  
+        }
       };
       
       self.refresh();
@@ -127,7 +142,7 @@
       
       return self;
     },
-    
+        
     /*
      * Destruct the plugin.
      *
@@ -181,10 +196,14 @@
       var selectee;
       
       this.opos = [event.pageX, event.pageY];
-      this.positionAbs = { top: event.pageY, left: event.pageX };
+      self.containers.each(function() {
+        $(this).sprintcar("onExternalContainerMouseStart", event);
+      });
+      self._updateMousePosition(event);
       
-      if (this.options.disabled)
+      if (this.options.disabled) {
         return;
+      }
       
       var options = this.options;
       
@@ -298,7 +317,6 @@
     _mouseDrag: function(event) {
       var self = this;
       var dragee = self.element.data("dragee");
-      var insert_pos_identifier = self.element.data("insert_pos_identifier");
       if( !dragee ) {
         return false;
       }
@@ -307,71 +325,28 @@
       this.positionAbs = { top: event.pageY, left: event.pageX };
       
       if (this.dragged) { // have already initialized dragging
-        //Do scrolling
-        if(this.options.scroll) {
-          var o = this.options, scrolled = false;
-          if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
-
-            if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
-              this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
-            else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
-              this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
-
-            if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
-              this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
-            else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
-              this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
-
-          } else {
-            if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
-              scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
-            else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
-              scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
-
-            if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
-              scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
-            else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
-              scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
-
-          }
-
-          if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
-            $.ui.ddmanager.prepareOffsets(this, event);
+      
+        if( self.insideWidget(self.positionAbs) ) {
+          //Do scrolling
+          self._updateScrollStatus(event);
+          self._updateInsertionPosition(event);
         }
-     
+        else {
+          self.containers.each(function() {
+            if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
+              $(this).sprintcar("onExternalContainerMouseDrag", event);
+            }
+            else {
+            }
+          });
+        }    
+        
         // updated the helper by moving it the difference between the last
         // mouse position and the new mouse position.
         var cur_helper_pos = this.helper.offset();
         var new_offset = { top: (this.positionAbs.top - this.lastPositionAbs.top), left: (this.positionAbs.left - this.lastPositionAbs.left) };
         this.helper.css('top', (cur_helper_pos.top + new_offset.top));
-        this.helper.css('left', (cur_helper_pos.left + new_offset.left));
-        
-        this.selectees.each(function(i, item) {
-          var hover_region = self._getItemHoverRegion($(this), event);
-          var dir = self._getDragVerticalDirection();
-          if( hover_region ) {
-            self.current_item_hovered = $(item);
-            var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
-            var offset = margin / 2;
-            
-            if( hover_region.top && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-            }
-            else if( hover_region.top && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
-            }
-            else if( hover_region.bottom && dir == "down" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
-            }
-            else if( hover_region.bottom && dir == "up" ) {
-              insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
-            }
-            if( hover_region.top || hover_region.bottom ) {
-              self.current_item_hovered_region = hover_region;              
-              insert_pos_identifier.show();
-            }
-          }
-        });
+        this.helper.css('left', (cur_helper_pos.left + new_offset.left));        
         
         //Interconnect with droppables
         if($.ui.ddmanager) $.ui.ddmanager.drag(this, event);
@@ -388,13 +363,6 @@
           this._cacheHelperProportions();
           this.currentItem = this.helper;
   
-          //Get the next scrolling parent
-          this.scrollParent = this.selectees.eq(0).scrollParent();
-          
-          //Prepare scrolling
-          if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML')
-            this.overflowOffset = this.scrollParent.offset();  
-          
           //Prepare possible droppables
           if($.ui.ddmanager) {
             $.ui.ddmanager.current = this;
@@ -419,18 +387,15 @@
       var insert_pos_identifier = self.element.data("insert_pos_identifier");
       
       if (self.dragged) {
-        if( self._insideWidget() ) {
+        if( self.insideWidget(self.positionAbs) ) {
           if( self.current_item_hovered_region ) {          
-            var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-            var orig_selectees_to_rem = [];
-            helperSelectees.each(function() {
-              var index = $(this).data('multidnd-index');
-              var origSelectee = self.selectees.filter(function() {
-                return ($(this).data('multidnd-index') == index);
-              });
-              origSelectee.hide();
-              orig_selectees_to_rem.push(origSelectee);
-            });
+            
+            var helperSelectees = $('.ui-selectee', self.helper).not('.ui-selectee-hidden');
+            
+            var selectees_to_rem = self._getHelperSelecteesToRemove(helperSelectees);
+            self._hideHelperSelectees(selectees_to_rem);
+            
+            self._unselect_all_selected(self.selectees);
           
             if( self.current_item_hovered_region.top ) {
               helperSelectees.insertBefore(self.current_item_hovered);
@@ -438,19 +403,37 @@
             else if( self.current_item_hovered_region.bottom ) {
               helperSelectees.insertAfter(self.current_item_hovered);            
             }
-            $(orig_selectees_to_rem).each(function () {
+            $(selectees_to_rem).each(function () {
               this.remove();
             });
           
             $.ui.ddmanager.current = null;
             self.refresh();
-            self._unselect_all_selected(self.selectees.filter('.ui-selected'));
-            self._trigger('update', event, this._uiHash());
+            self._populate_selection_stack_with_selected(self.selectees);
+            self._trigger('update', event, self.serialize(), self);
           }
         } else {
+          
+          // handle dropping in an external container
+          self.containers.each(function() {
+            if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
+              var helperSelectees = $('.ui-selectee', self.helper).not('.ui-selectee-hidden');
+              var selectees_to_rem = self._getHelperSelecteesToRemove(helperSelectees);
+              self._hideHelperSelectees(selectees_to_rem);
+              $(this).sprintcar("onExternalContainerMouseStop", event, helperSelectees);
+              $(selectees_to_rem).each(function () {
+                this.remove();
+              });
+              self.refresh();
+            }
+            else {
+            }
+          });
+          
           //If we are using droppables, inform the manager about the drop
-          if ($.ui.ddmanager)
+          if ($.ui.ddmanager) {
             $.ui.ddmanager.drop(this, event);
+          }
         }
         
         this.dragged = false;
@@ -463,7 +446,7 @@
         // mouse up on a non-selected item
         if (!$(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // move all items that were previously selected to a state of unselected
-          self._unselect_all_selected(self.selectees.filter('.ui-selected'));
+          self._unselect_all_selected(self.selectees);
           
           // move the item that was mouse downed on to a state of selected
           var selectee = $(event.target).data("selectable-item");
@@ -475,7 +458,7 @@
         // mouse up on an already selected item
         } else if ($(event.target).hasClass('ui-selected') && !event.metaKey && !event.shiftKey) {
           // everything that was already selected should be put in state of unselected
-          self._unselect_all_selected(this.selectees.filter('.ui-selected').not($(event.target)));
+          self._unselect_all_selected(this.selectees.not($(event.target)));
         }
       }
       this.possible_nonselected_drag = false;
@@ -483,12 +466,135 @@
       
       return false;
     },
+    
+    _getHelperSelecteesToRemove: function(helperSelectees) {
+      var self = this;
+      var orig_selectees_to_rem = [];
+      helperSelectees.each(function() {
+        var index = $(this).data('multidnd-index');
+        var origSelectee = self.selectees.filter(function() {
+          return ($(this).data('multidnd-index') == index);
+        });
+        orig_selectees_to_rem.push(origSelectee);
+      });
+      return orig_selectees_to_rem;
+    },
+    
+    _hideHelperSelectees: function(selectees) {
+      $(selectees).each(function() {
+        $(this).hide();
+      }); 
+    },
+    
+    onExternalContainerMouseStart: function(event) {
+      var self = this;
+      self._updateMousePosition(event);
+    },
+    
+    onExternalContainerMouseDrag: function(event) {
+      var self = this;
+      self._updateScrollStatus(event);
+      self._updateMousePosition(event);
+      self._updateInsertionPosition(event);
+    },
+    
+    onExternalContainerMouseStop: function(event, helperSelectees) {
+      var self = this;
+      self._unselect_all_selected(self.selectees);
+      if( self.current_item_hovered_region.top ) {
+        helperSelectees.insertBefore(self.current_item_hovered);
+      }
+      else if( self.current_item_hovered_region.bottom ) {
+        helperSelectees.insertAfter(self.current_item_hovered);            
+      }
+      $.ui.ddmanager.current = null;
+      self.refresh();
+      self._populate_selection_stack_with_selected(self.selectees);
+      self._trigger('update', event, self.serialize(), self);
+    },
+    
+    _updateScrollStatus: function(event) {
+      if(this.options.scroll) {
+        var o = this.options, scrolled = false;
+        if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
+
+          if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity) {
+            this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+          }
+          else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity) {
+            this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+          }
+
+          if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity) {
+            this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+          }
+          else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
+            this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+          }
+
+        } else {
+          if(event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
+            scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+          }
+          else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity) {
+            scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+          }
+
+          if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity) {
+            scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+          }
+          else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity) {
+            scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+          }
+
+        }
+
+        if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour) {
+           $.ui.ddmanager.prepareOffsets(this, event);
+        }
+      }
+    },
+    
+    _updateMousePosition: function(event) {
+      this.lastPositionAbs = this.positionAbs;
+      this.positionAbs = { top: event.pageY, left: event.pageX };  
+    },
+    
+    _updateInsertionPosition: function(event) {
+      var self = this;
+      var insert_pos_identifier = self.element.data("insert_pos_identifier");     
+      this.selectees.each(function(i, item) {
+        var hover_region = self._getItemHoverRegion($(this), event);
+        var dir = self._getDragVerticalDirection();
+        if( hover_region ) {
+          self.current_item_hovered = $(item);
+          var margin = (self.current_item_hovered.outerHeight(true) - self.current_item_hovered.innerHeight()) / 2;
+          var offset = margin / 2;
+
+          if( hover_region.top && dir == "up" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+          }
+          else if( hover_region.top && dir == "down" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top - offset - 1);
+          }
+          else if( hover_region.bottom && dir == "down" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);
+          }
+          else if( hover_region.bottom && dir == "up" ) {
+            insert_pos_identifier.css('top', self.current_item_hovered.offset().top + self.current_item_hovered.outerHeight() + offset - 1);              
+          }
+          if( hover_region.top || hover_region.bottom ) {
+            self.current_item_hovered_region = hover_region;              
+            insert_pos_identifier.show();
+          }
+        }
+      });
+    },
         
     _getItemHoverRegion: function(item, event) {
       var self = this;
-
       var sp = self.scrollParent;
-      var pos = sp.offset();
+      var pos = sp.offset;
       
       if ((event.pageX < pos.left) || (event.pageY < pos.top)) {
         return null;
@@ -505,16 +611,20 @@
       var dx = event.pageX - offset.left;
       var dy = event.pageY - offset.top;
 
-      if( dy > 0 && dy < (h * self.options.hover_region_threshold) )
+      if( dy > 0 && dy < (h * self.options.hover_region_threshold) ) {
         result.top = true;
-      else if( dy > (h * (1.0 - self.options.hover_region_threshold)) && dy < h )
+      }
+      else if( dy > (h * (1.0 - self.options.hover_region_threshold)) && dy < h ) {
         result.bottom = true;
+      }
 
-      if( dx > 0 && dx < w && dy > 0 && dy < h  )
+      if( dx > 0 && dx < w && dy > 0 && dy < h  ) {
         return result;
-      else
+      }
+      else {
         return null;
-     },
+      }
+    },
     
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
@@ -557,39 +667,26 @@
       return container;
     },
     
-    _insideWidget: function() {
+    insideWidget: function(pos) {
       var contPos = this.element.offset();
       var contDim = { width: this.element.outerWidth(), height: this.element.outerHeight() };
       
-      if( this.positionAbs.top > contPos.top &&
-          this.positionAbs.left > contPos.left &&
-          this.positionAbs.top < (contPos.top + contDim.height) &&
-          this.positionAbs.left < (contPos.left + contDim.width) )
+      if( pos.top > contPos.top &&
+          pos.left > contPos.left &&
+          pos.top < (contPos.top + contDim.height) &&
+          pos.left < (contPos.left + contDim.width) )
       {
           return true;
       }
       return false;
     },
-    
-    _uiHash: function(inst) {
-      var self = inst || this;
-      return {
-        helper: self.helper,
-        placeholder: self.placeholder || $([]),
-        position: self.position,
-        originalPosition: self.originalPosition,
-        offset: self.positionAbs,
-        item: self.currentItem,
-        sender: inst ? inst.element : null
-      };
-    },
-    
+        
     serialize: function(o) {
       var items = this.selectees;
       var str = []; o = o || {};
       
       $(items).each(function() {
-        var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
+        var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[\-=_](.+)/));
         if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
       });
       
@@ -629,7 +726,7 @@
     _unselect_all_selected: function(objs) {
       var self = this;
       
-      objs.each(function() {
+      objs.filter('.ui-selected').each(function() {
         var selectee = $.data(this, "selectable-item");
         selectee.$element.removeClass('ui-selected');
         selectee.selected = false;
@@ -641,6 +738,15 @@
           self.selection_stack.splice(idx,1);
         }
       });
+    },
+    
+    _populate_selection_stack_with_selected: function(objs) {
+      var self = this;
+      objs.filter('.ui-selected').each(function() {
+        var selectee = $.data(this, "selectable-item");
+        self.selection_stack.push(selectee.element);
+      });
     }
+    
   });
 })(jQuery);
