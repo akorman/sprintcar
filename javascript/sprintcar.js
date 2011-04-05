@@ -500,6 +500,7 @@
     
     onExternalContainerMouseStop: function(event, helperSelectees) {
       var self = this;
+      self._unselect_all_selected(self.selectees);
       if( self.current_item_hovered_region.top ) {
         helperSelectees.insertBefore(self.current_item_hovered);
       }
