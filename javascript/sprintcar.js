@@ -325,37 +325,8 @@
       
         if( self.insideWidget(self.positionAbs) ) {
           //Do scrolling
-          if(this.options.scroll) {
-            var o = this.options, scrolled = false;
-            if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
-
-              if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
-                this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
-              else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
-                this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
-
-              if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
-                this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
-              else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
-                this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
-
-            } else {
-              if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
-                scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
-              else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
-                scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
-
-              if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
-                scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
-              else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
-                scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
-
-            }
-
-            if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
-              $.ui.ddmanager.prepareOffsets(this, event);
-          }
-
+          self.updateScrollStatus(event);
+        
           self.updateInsertionPosition(event);
         }
         else {
@@ -481,6 +452,39 @@
       this._trigger("stop", event);
       
       return false;
+    },
+    
+    updateScrollStatus: function(event) {
+      if(this.options.scroll) {
+        var o = this.options, scrolled = false;
+        if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
+
+          if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
+            this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
+          else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
+            this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+
+          if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
+            this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+          else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
+            this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+
+        } else {
+          if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
+            scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+          else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
+            scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+
+          if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
+            scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+          else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
+            scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+
+        }
+
+        if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
+          $.ui.ddmanager.prepareOffsets(this, event);
+      }
     },
     
     updateMousePosition: function(event) {
