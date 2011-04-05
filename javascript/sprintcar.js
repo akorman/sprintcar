@@ -332,8 +332,9 @@
         else {
           self.containers.each(function() {
             if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
-              $(this).sprintcar("updateMousePosition", event)
-              $(this).sprintcar("updateInsertionPosition", event)
+              $(this).sprintcar("updateScrollStatus", event);
+              $(this).sprintcar("updateMousePosition", event);
+              $(this).sprintcar("updateInsertionPosition", event);
             }
             else {
             }
