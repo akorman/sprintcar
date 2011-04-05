@@ -10,8 +10,8 @@
     $(document).ready(function() {
       $('#list, #list2').sprintcar({
         connectWith: ".list",
-        update: function(event, data) {
-          //alert("Updated order (serialized list follows): " + $('#list').sprintcar('serialize'));
+        update: function(event, data, ui) {
+          //alert("Updated order (serialized list follows): " + data);
         }
       });
       $( "#droppable" ).droppable({
@@ -108,32 +108,32 @@
     <div id='task_35'>Put new grass in the backyard</div>
   </div>
   <div id="list2" class="list">
-    <div id='task_1'>a</div>
-    <div id='task_2'>b</div>
-    <div id='task_3'>c</div>
-    <div id='task_4'>d</div>
-    <div id='task_5'>e</div>
-    <div id='task_6'>f</div>
-    <div id='task_7'>g</div>
-    <div id='task_8'>h</div>
-    <div id='task_9'>i</div>
-    <div id='task_10'>j</div>
-    <div id='task_11'>k</div>
-    <div id='task_12'>l</div>
-    <div id='task_13'>m</div>
-    <div id='task_14'>n</div>
-    <div id='task_15'>o</div>
-    <div id='task_16'>p</div>
-    <div id='task_17'>q</div>
-    <div id='task_18'>r</div>
-    <div id='task_19'>s</div>
-    <div id='task_20'>t</div>
-    <div id='task_21'>u</div>
-    <div id='task_22'>v</div>
-    <div id='task_23'>w</div>
-    <div id='task_24'>x</div>
-    <div id='task_25'>y</div>
-    <div id='task_26'>z</div>
+    <div id='task_111'>a</div>
+    <div id='task_112'>b</div>
+    <div id='task_113'>c</div>
+    <div id='task_114'>d</div>
+    <div id='task_115'>e</div>
+    <div id='task_116'>f</div>
+    <div id='task_117'>g</div>
+    <div id='task_118'>h</div>
+    <div id='task_119'>i</div>
+    <div id='task_1110'>j</div>
+    <div id='task_1111'>k</div>
+    <div id='task_1112'>l</div>
+    <div id='task_1113'>m</div>
+    <div id='task_1114'>n</div>
+    <div id='task_1115'>o</div>
+    <div id='task_1116'>p</div>
+    <div id='task_1117'>q</div>
+    <div id='task_1118'>r</div>
+    <div id='task_1119'>s</div>
+    <div id='task_1120'>t</div>
+    <div id='task_1121'>u</div>
+    <div id='task_1122'>v</div>
+    <div id='task_1123'>w</div>
+    <div id='task_1124'>x</div>
+    <div id='task_1125'>y</div>
+    <div id='task_1126'>z</div>
   </div>  
 <div id="droppable" class="ui-widget-header">
   <p>Drop here</p>

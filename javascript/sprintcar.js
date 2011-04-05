@@ -77,8 +77,9 @@
       self.current_item_hovered_region = null;
       
       // ensure hover_region_threshold is a sensible value.
-      if( self.options.hover_region_threshold > 0.5 )
+      if( self.options.hover_region_threshold > 0.5 ) {
         self.options.hover_region_threshold = 0.5;
+      }
       
       /*
        * Refresh the plugins knowledge of what it is responsible for managing.
@@ -123,7 +124,7 @@
         self.options.insert_pos_identifier.css("left", self.selectees.eq(0).offset().left);
         self.element.data("insert_pos_identifier", self.options.insert_pos_identifier);
         
-    		if(self.options.connectWith != false) {
+    		if(self.options.connectWith !== false) {
           self.containers = $(self.options.connectWith).not(self.element);
     		}
     		
@@ -131,8 +132,9 @@
         self.scrollParent = self.selectees.eq(0).scrollParent();
         
         //Prepare scrolling
-        if(self.scrollParent[0] != document && self.scrollParent[0].tagName != 'HTML')
+        if(self.scrollParent[0] != document && self.scrollParent[0].tagName != 'HTML') {
           self.overflowOffset = self.scrollParent.offset();  
+        }
       };
       
       self.refresh();
@@ -195,12 +197,13 @@
       
       this.opos = [event.pageX, event.pageY];
       self.containers.each(function() {
-        $(this).sprintcar("onExternalContainerMouseStart", event)
+        $(this).sprintcar("onExternalContainerMouseStart", event);
       });
       self._updateMousePosition(event);
       
-      if (this.options.disabled)
+      if (this.options.disabled) {
         return;
+      }
       
       var options = this.options;
       
@@ -386,17 +389,12 @@
       if (self.dragged) {
         if( self.insideWidget(self.positionAbs) ) {
           if( self.current_item_hovered_region ) {          
-            var helperSelectees = $('.ui-selectee', this.helper).not('.ui-selectee-hidden');
-            var orig_selectees_to_rem = [];
-            helperSelectees.each(function() {
-              var index = $(this).data('multidnd-index');
-              var origSelectee = self.selectees.filter(function() {
-                return ($(this).data('multidnd-index') == index);
-              });
-              origSelectee.hide();
-              orig_selectees_to_rem.push(origSelectee);
-            });
-
+            
+            var helperSelectees = $('.ui-selectee', self.helper).not('.ui-selectee-hidden');
+            
+            var selectees_to_rem = self._getHelperSelecteesToRemove(helperSelectees);
+            self._hideHelperSelectees(selectees_to_rem);
+            
             self._unselect_all_selected(self.selectees);
           
             if( self.current_item_hovered_region.top ) {
@@ -405,20 +403,37 @@
             else if( self.current_item_hovered_region.bottom ) {
               helperSelectees.insertAfter(self.current_item_hovered);            
             }
-            $(orig_selectees_to_rem).each(function () {
+            $(selectees_to_rem).each(function () {
               this.remove();
             });
           
             $.ui.ddmanager.current = null;
             self.refresh();
-            //self._unselect_all_selected(self.selectees);
             self._populate_selection_stack_with_selected(self.selectees);
-            self._trigger('update', event, this._uiHash());
+            self._trigger('update', event, self.serialize(), self);
           }
         } else {
+          
+          // handle dropping in an external container
+          self.containers.each(function() {
+            if( $(this).sprintcar("insideWidget", self.positionAbs) ) {
+              var helperSelectees = $('.ui-selectee', self.helper).not('.ui-selectee-hidden');
+              var selectees_to_rem = self._getHelperSelecteesToRemove(helperSelectees);
+              self._hideHelperSelectees(selectees_to_rem);
+              $(this).sprintcar("onExternalContainerMouseStop", event, helperSelectees);
+              $(selectees_to_rem).each(function () {
+                this.remove();
+              });
+              self.refresh();
+            }
+            else {
+            }
+          });
+          
           //If we are using droppables, inform the manager about the drop
-          if ($.ui.ddmanager)
+          if ($.ui.ddmanager) {
             $.ui.ddmanager.drop(this, event);
+          }
         }
         
         this.dragged = false;
@@ -452,6 +467,25 @@
       return false;
     },
     
+    _getHelperSelecteesToRemove: function(helperSelectees) {
+      var self = this;
+      var orig_selectees_to_rem = [];
+      helperSelectees.each(function() {
+        var index = $(this).data('multidnd-index');
+        var origSelectee = self.selectees.filter(function() {
+          return ($(this).data('multidnd-index') == index);
+        });
+        orig_selectees_to_rem.push(origSelectee);
+      });
+      return orig_selectees_to_rem;
+    },
+    
+    _hideHelperSelectees: function(selectees) {
+      $(selectees).each(function() {
+        $(this).hide();
+      }); 
+    },
+    
     onExternalContainerMouseStart: function(event) {
       var self = this;
       self._updateMousePosition(event);
@@ -464,36 +498,59 @@
       self._updateInsertionPosition(event);
     },
     
+    onExternalContainerMouseStop: function(event, helperSelectees) {
+      var self = this;
+      if( self.current_item_hovered_region.top ) {
+        helperSelectees.insertBefore(self.current_item_hovered);
+      }
+      else if( self.current_item_hovered_region.bottom ) {
+        helperSelectees.insertAfter(self.current_item_hovered);            
+      }
+      $.ui.ddmanager.current = null;
+      self.refresh();
+      self._populate_selection_stack_with_selected(self.selectees);
+      self._trigger('update', event, self.serialize(), self);
+    },
+    
     _updateScrollStatus: function(event) {
       if(this.options.scroll) {
         var o = this.options, scrolled = false;
         if(this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
 
-          if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity)
+          if((this.overflowOffset.top + this.scrollParent[0].offsetHeight) - event.pageY < o.scrollSensitivity) {
             this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop + o.scrollSpeed;
-          else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity)
+          }
+          else if(event.pageY - this.overflowOffset.top < o.scrollSensitivity) {
             this.scrollParent[0].scrollTop = scrolled = this.scrollParent[0].scrollTop - o.scrollSpeed;
+          }
 
-          if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity)
+          if((this.overflowOffset.left + this.scrollParent[0].offsetWidth) - event.pageX < o.scrollSensitivity) {
             this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft + o.scrollSpeed;
-          else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity)
+          }
+          else if(event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
             this.scrollParent[0].scrollLeft = scrolled = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+          }
 
         } else {
-          if(event.pageY - $(document).scrollTop() < o.scrollSensitivity)
+          if(event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
             scrolled = $(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
-          else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity)
+          }
+          else if($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity) {
             scrolled = $(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+          }
 
-          if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity)
+          if(event.pageX - $(document).scrollLeft() < o.scrollSensitivity) {
             scrolled = $(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
-          else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity)
+          }
+          else if($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity) {
             scrolled = $(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+          }
 
         }
 
-        if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour)
-          $.ui.ddmanager.prepareOffsets(this, event);
+        if(scrolled !== false && $.ui.ddmanager && !o.dropBehaviour) {
+           $.ui.ddmanager.prepareOffsets(this, event);
+        }
       }
     },
     
@@ -553,16 +610,20 @@
       var dx = event.pageX - offset.left;
       var dy = event.pageY - offset.top;
 
-      if( dy > 0 && dy < (h * self.options.hover_region_threshold) )
+      if( dy > 0 && dy < (h * self.options.hover_region_threshold) ) {
         result.top = true;
-      else if( dy > (h * (1.0 - self.options.hover_region_threshold)) && dy < h )
+      }
+      else if( dy > (h * (1.0 - self.options.hover_region_threshold)) && dy < h ) {
         result.bottom = true;
+      }
 
-      if( dx > 0 && dx < w && dy > 0 && dy < h  )
+      if( dx > 0 && dx < w && dy > 0 && dy < h  ) {
         return result;
-      else
+      }
+      else {
         return null;
-     },
+      }
+    },
     
     _getDragVerticalDirection: function() {
       var delta = this.positionAbs.top - this.lastPositionAbs.top;
@@ -618,26 +679,13 @@
       }
       return false;
     },
-    
-    _uiHash: function(inst) {
-      var self = inst || this;
-      return {
-        helper: self.helper,
-        placeholder: self.placeholder || $([]),
-        position: self.position,
-        originalPosition: self.originalPosition,
-        offset: self.positionAbs,
-        item: self.currentItem,
-        sender: inst ? inst.element : null
-      };
-    },
-    
+        
     serialize: function(o) {
       var items = this.selectees;
       var str = []; o = o || {};
       
       $(items).each(function() {
-        var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[-=_](.+)/));
+        var res = ($(o.item || this).attr(o.attribute || 'id') || '').match(o.expression || (/(.+)[\-=_](.+)/));
         if(res) str.push((o.key || res[1]+'[]')+'='+(o.key && o.expression ? res[1] : res[2]));
       });
       
