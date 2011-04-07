@@ -43,6 +43,13 @@
       position: relative; /* this is required for IE 8 to detect the container as a scrollParent() */
     }
     
+    .ui-selected {
+      -webkit-transition: background-color .2s ease-in-out;
+    	-moz-transition: background-color .2s ease-in-out;
+    	-o-transition: background-color .2s ease-in-out;
+    	transition: background-color .2s ease-in-out;
+    }
+    
     .ui-selectee {
       border-radius: 5px;
       background-color: #fcfcfc;
@@ -52,6 +59,11 @@
       margin-top: 2px;
       margin-bottom: 2px;
     }
+    
+      .ui-selectee:hover {
+        background-color: #efefef;
+        cursor: pointer;
+      }
     
     .ui-selectee.ui-selecting {
       background-color: yellow;
@@ -65,6 +77,10 @@
       background-color: #b5d5ff;
     }
     
+      .ui-selectee.ui-selected:hover {
+        background-color: #a4ccfe;
+      }
+    
     .ui-selectee.ui-selectee-hidden {
       visibility: hidden;
     }
@@ -77,6 +93,8 @@
       margin: 0px;
       padding: 0px;
     }
+    
+    
   </style>
 </head>
 <body id="index" onload="">
